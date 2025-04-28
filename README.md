@@ -69,7 +69,7 @@ It combines **education** and **entertainment**, making herbal knowledge accessi
 
 > Here's a quick glimpse of **The Herbal Codex**:
 
-![The Herbal Codex Preview](./preview.png)
+![The Herbal Codex Preview](./preview.png.png)
 
 ---
 
