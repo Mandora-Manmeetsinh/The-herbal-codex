@@ -6,6 +6,9 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Quiz from './pages/Quiz';
 import NotFound from './pages/NotFound';
+import Learn from './pages/Learn';
+import Garden3D from './pages/Garden3D';
+
 
 import NavigationBar from './components/NavBar';
 import Footer from './components/Footer';
@@ -24,6 +27,8 @@ function App() {
           <Route path="/explore" element={<Explore />} />
           <Route path="/plant/:id" element={<PlantDetail />} />
           <Route path="/about" element={<About />} />
+          <Route path="/learn" element={<Learn />} />
+          <Route path="/3d" element={<Garden3D />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/quiz" element={<Quiz />} />
           <Route path="*" element={<NotFound />} />

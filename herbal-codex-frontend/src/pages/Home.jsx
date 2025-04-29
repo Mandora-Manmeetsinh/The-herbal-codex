@@ -21,7 +21,7 @@ function Home() {
           <Row className="align-items-center">
             <Col md={6}>
               <img
-                src="https://images.unsplash.com/photo-1524594150400-1e2e6a1a79e0?auto=format&fit=crop&w=800&q=80"
+                src="../assets/images/herbal-garden.png"
                 alt="Herbal Garden"
                 className="img-fluid rounded shadow-sm"
               />
