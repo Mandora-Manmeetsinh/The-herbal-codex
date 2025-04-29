@@ -1,5 +1,17 @@
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import { Suspense } from 'react';
+
+function PlantPlaceholder() {
+  return (
+    <mesh position={[0, 0.5, 0]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="green" />
+    </mesh>
+  );
+}
 
 function Explore() {
   const plants = [
@@ -65,7 +77,25 @@ function Explore() {
           </Button>
         </Container>
       </section>
+
+      <Container fluid className="p-0" style={{ height: '90vh' }}>
+      <Canvas camera={{ position: [2, 2, 5], fov: 60 }}>
+        {/* Lighting */}
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[2, 2, 2]} intensity={1} />
+
+        {/* Controls */}
+        <OrbitControls enablePan enableZoom enableRotate />
+
+        {/* Scene Content */}
+        <Suspense fallback={null}>
+          <PlantPlaceholder />
+        </Suspense>
+      </Canvas>
+    </Container>
     </div>
+
+    
   );
 }
 
