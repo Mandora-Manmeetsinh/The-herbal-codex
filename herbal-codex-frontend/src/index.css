@@ -66,3 +66,54 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+section {
+  padding: 60px 0;
+}
+
+section h2 {
+  font-weight: bold;
+}
+
+img {
+  max-width: 100%;
+}
+img[loading="lazy"] {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+img[loading="lazy"]::before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+img[loading="lazy"]::after {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+img[loading="lazy"]::before,
+img[loading="lazy"]::after {
+  background: linear-gradient(45deg, #f0f0f0 25%, #e0e0e0 25%, #e0e0e0 50%, #f0f0f0 50%, #f0f0f0 75%, #e0e0e0 75%, #e0e0e0);
+  background-size: 40px 40px;
+}
+img[loading="lazy"]::before,
+img[loading="lazy"]::after {
+  animation: loading 1.5s infinite linear;
+}
+@keyframes loading {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: -40px -40px;
+  }
+}
+@media (prefers-color-scheme: light) {
+  img[loading="lazy"]::before,
+  img[loading="lazy"]::after {
+    background: linear-gradient(45deg, #f0f0f0 25%, #e0e0e0 25%, #e0e0e0 50%, #f0f0f0 50%, #f0f0f0 75%, #e0e0e0 75%, #e0e0e0);
+    background-size: 40px 40px;
+  }
+}
