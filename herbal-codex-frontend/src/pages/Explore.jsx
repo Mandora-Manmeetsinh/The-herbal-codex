@@ -1,8 +1,10 @@
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { Container, Row, Col, Card, Button, Spinner, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Suspense } from 'react';
+import PlantCard from '../components/PlantCard';
 
 function PlantPlaceholder() {
   return (
@@ -14,26 +16,51 @@ function PlantPlaceholder() {
 }
 
 function Explore() {
-  const plants = [
-    {
-      id: 1,
-      name: 'Tulsi',
-      image: 'https://images.unsplash.com/photo-1615554951186-6ed65d692f7f?auto=format&fit=crop&w=400&q=80',
-      description: 'Holy Basil known for immunity-boosting powers.',
-    },
-    {
-      id: 2,
-      name: 'Neem',
-      image: 'https://images.unsplash.com/photo-1578894381037-3b16b72081b6?auto=format&fit=crop&w=400&q=80',
-      description: 'Neem is antibacterial and purifies blood.',
-    },
-    {
-      id: 3,
-      name: 'Aloe Vera',
-      image: 'https://images.unsplash.com/photo-1598266660370-4d048bdb38e0?auto=format&fit=crop&w=400&q=80',
-      description: 'Used for skin treatment and cooling relief.',
-    },
-  ];
+  const [plants, setPlants] = useState([]);
+  const [filteredPlants, setFilteredPlants] = useState([]);
+  const [search, setSearch] = useState('');
+  const [regionFilter, setRegionFilter] = useState('All');
+  const [benefitFilter, setBenefitFilter] = useState('All');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/plants')
+      .then((res) => res.json())
+      .then((data) => {
+        setPlants(data);
+        setFilteredPlants(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error fetching plants:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    let results = plants;
+
+    if (search) {
+      results = results.filter((p) =>
+        p.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    if (regionFilter !== 'All') {
+      results = results.filter((p) => p.region === regionFilter);
+    }
+
+    if (benefitFilter !== 'All') {
+      results = results.filter((p) =>
+        p.benefits.some((b) => b.toLowerCase().includes(benefitFilter.toLowerCase()))
+      );
+    }
+
+    setFilteredPlants(results);
+  }, [search, regionFilter, benefitFilter, plants]);
+
+  const uniqueRegions = [...new Set(plants.map((p) => p.region))];
+  const uniqueBenefits = [...new Set(plants.flatMap((p) => p.benefits))];
 
   return (
     <div>
@@ -45,19 +72,52 @@ function Explore() {
         </Container>
       </section>
 
+      {/* Filters Section */}
+      <Container className="mt-4">
+        <h2>🌿 Explore Medicinal Plants</h2>
+        <Form className="mb-4">
+          <Row>
+            <Col md={4}>
+              <Form.Control
+                type="text"
+                placeholder="🔍 Search by name..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </Col>
+            <Col md={4}>
+              <Form.Select value={regionFilter} onChange={(e) => setRegionFilter(e.target.value)}>
+                <option>All</option>
+                {uniqueRegions.map((r, i) => (
+                  <option key={i}>{r}</option>
+                ))}
+              </Form.Select>
+            </Col>
+            <Col md={4}>
+              <Form.Select value={benefitFilter} onChange={(e) => setBenefitFilter(e.target.value)}>
+                <option>All</option>
+                {uniqueBenefits.map((b, i) => (
+                  <option key={i}>{b}</option>
+                ))}
+              </Form.Select>
+            </Col>
+          </Row>
+        </Form>
+      </Container>
+
       {/* Featured Plants */}
       <section className="py-5">
         <Container>
           <h2 className="text-center mb-4">Featured Medicinal Plants</h2>
           <Row>
-            {plants.map((plant) => (
-              <Col md={4} key={plant.id} className="mb-4">
+            {plants.slice(0, 3).map((plant) => (
+              <Col md={4} key={plant._id} className="mb-4">
                 <Card className="h-100 shadow-sm">
                   <Card.Img variant="top" src={plant.image} />
                   <Card.Body>
                     <Card.Title>{plant.name}</Card.Title>
                     <Card.Text>{plant.description}</Card.Text>
-                    <Button as={Link} to={`/plant/${plant.id}`} variant="outline-success">
+                    <Button as={Link} to={`/plant/${plant._id}`} variant="outline-success">
                       Learn More
                     </Button>
                   </Card.Body>
@@ -78,24 +138,45 @@ function Explore() {
         </Container>
       </section>
 
+      {/* 3D Canvas */}
       <Container fluid className="p-0" style={{ height: '90vh' }}>
-      <Canvas camera={{ position: [2, 2, 5], fov: 60 }}>
-        {/* Lighting */}
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[2, 2, 2]} intensity={1} />
+        <Canvas camera={{ position: [2, 2, 5], fov: 60 }}>
+          {/* Lighting */}
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[2, 2, 2]} intensity={1} />
 
-        {/* Controls */}
-        <OrbitControls enablePan enableZoom enableRotate />
+          {/* Controls */}
+          <OrbitControls enablePan enableZoom enableRotate />
 
-        {/* Scene Content */}
-        <Suspense fallback={null}>
-          <PlantPlaceholder />
-        </Suspense>
-      </Canvas>
-    </Container>
+          {/* Scene Content */}
+          <Suspense fallback={<div style={{ color: 'white', textAlign: 'center' }}>Loading 3D Scene...</div>}>
+            <PlantPlaceholder />
+          </Suspense>
+        </Canvas>
+      </Container>
+
+      {/* Medicinal Plants Section */}
+      <Container className="mt-4">
+        {loading ? (
+          <div className="text-center p-5">
+            <Spinner animation="border" variant="success" />
+            <p>Loading plants...</p>
+          </div>
+        ) : (
+          <Row>
+            {filteredPlants.length > 0 ? (
+              filteredPlants.map((plant) => (
+                <Col key={plant._id} sm={12} md={6} lg={4} xl={3}>
+                  <PlantCard plant={plant} />
+                </Col>
+              ))
+            ) : (
+              <p>No plants match your filters.</p>
+            )}
+          </Row>
+        )}
+      </Container>
     </div>
-
-    
   );
 }
 
