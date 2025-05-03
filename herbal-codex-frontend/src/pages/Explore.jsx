@@ -139,11 +139,11 @@ function Explore() {
       </section>
 
       {/* 3D Canvas */}
-      <Container fluid className="p-0" style={{ height: '90vh' }}>
-        <Canvas camera={{ position: [2, 2, 5], fov: 60 }}>
+      <Container fluid className="p-0" style={{ height: '80vh' }}>
+        <Canvas camera={{ position: [3, 4, 5], fov: 80 }}>
           {/* Lighting */}
           <ambientLight intensity={0.5} />
-          <directionalLight position={[2, 2, 2]} intensity={1} />
+          <directionalLight position={[3, 1, 4]} intensity={1} />
 
           {/* Controls */}
           <OrbitControls enablePan enableZoom enableRotate />
