@@ -1,6 +1,6 @@
 // src/components/Navbar.jsx
 import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../components/AuthContext';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -44,4 +44,4 @@ function CustomNavbar() {
   );
 }
 
-export default CustomNavbar;
+export default Navbar;
