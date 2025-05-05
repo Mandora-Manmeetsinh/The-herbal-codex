@@ -3,11 +3,18 @@ import './index.css';  // apdu custom css (if needed)
 import App from './App.jsx';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { Authprovider } from './context/AuthContext.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <react.StrictMode>
+    <BrowserRouter>
+      <Authprovider>
+        <App />
+      </Authprovider>
+    </BrowserRouter>
+    {/* <App /> */} 
+  </react.StrictMode>,
 );
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
