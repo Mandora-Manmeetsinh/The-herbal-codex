@@ -84,9 +84,9 @@ It combines **education** and **entertainment**, making herbal knowledge accessi
 
 ## 🤝 Contributors
 
-- **Project Lead**: [Your Name]
-- **UI/UX Designer**: [Your Name or Team Member]
-- **3D Developer**: [Your Name or Team Member]
+- **Project Lead**: [Mandora Manmeetsinh]
+- **UI/UX Designer**: [Mandora Manmeetsinh]
+- **3D Developer**: [Mandora Manmeetsinh]
 
 ---
 
