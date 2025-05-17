@@ -37,7 +37,7 @@ const Environment = ({ isRaining }: EnvironmentProps) => {
       });
       
       if (rainRef.current) {
-        scene.remove(rainRef.current);
+        (scene as any).remove(rainRef.current);
       }
       
       const rain = new THREE.Points(geometry, material);
