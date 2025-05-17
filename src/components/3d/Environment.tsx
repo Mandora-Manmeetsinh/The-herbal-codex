@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { Sky, Environment as DreiEnvironment, Stars, Cloud } from '@react-three/drei';
@@ -203,9 +204,10 @@ const Environment = ({ isRaining }: EnvironmentProps) => {
       {/* Clouds */}
       {!isRaining && (
         <>
-          <Cloud position={[-10, 15, 0]} args={[3, 2]} />
-          <Cloud position={[10, 18, -10]} args={[4, 2]} />
-          <Cloud position={[0, 20, 10]} args={[3.5, 2]} />
+          {/* Fix the Cloud component args type issues */}
+          <Cloud position={[-10, 15, 0]} args={[3, 2] as [number, number]} />
+          <Cloud position={[10, 18, -10]} args={[4, 2] as [number, number]} />
+          <Cloud position={[0, 20, 10]} args={[3.5, 2] as [number, number]} />
         </>
       )}
       

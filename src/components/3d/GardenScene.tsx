@@ -257,7 +257,8 @@ const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
               rotation={path.rotation as [number, number, number]}
               receiveShadow
             >
-              <boxGeometry args={path.scale} />
+              {/* Fixed: Specify the correct tuple type for boxGeometry args */}
+              <boxGeometry args={[path.scale[0], path.scale[1], path.scale[2]]} />
               <meshStandardMaterial color="#e0d2bc" roughness={0.9} />
             </mesh>
           ))}

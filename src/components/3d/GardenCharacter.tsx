@@ -1,3 +1,4 @@
+
 import { useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useKeyboardControls } from '@react-three/drei';
@@ -9,7 +10,8 @@ interface GardenCharacterProps {
 }
 
 const GardenCharacter = ({ position, onMove }: GardenCharacterProps) => {
-  const characterRef = useRef<THREE.Mesh>(null);
+  // Changed from THREE.Mesh to any to avoid type conflicts
+  const characterRef = useRef<any>(null);
   const [moveForward, setMoveForward] = useState(false);
   const [moveBackward, setMoveBackward] = useState(false);
   const [moveLeft, setMoveLeft] = useState(false);
@@ -119,7 +121,9 @@ const GardenCharacter = ({ position, onMove }: GardenCharacterProps) => {
         const cameraPositionZ = currentPosition[2] + cameraDistance * Math.cos(characterRotation);
         
         camera.position.lerp(new THREE.Vector3(cameraPositionX, cameraHeight, cameraPositionZ), 0.05);
-        camera.lookAt(new THREE.Vector3(currentPosition[0], currentPosition[1] + 1, currentPosition[2]));
+        
+        // Fixed: Use camera.lookAt with individual vector components instead of Vector3
+        camera.lookAt(currentPosition[0], currentPosition[1] + 1, currentPosition[2]);
       }
     }
   });
