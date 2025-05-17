@@ -38,17 +38,25 @@ const Plant3D = ({
   // Try to load the model, but handle errors gracefully
   let gltfResult: any = null;
   try {
-    // Try to load the model, wrapped in try-catch to handle errors
-    gltfResult = useGLTF(model, undefined, 
-      (error) => {
-        console.error(`Failed to load model ${model}:`, error);
-        setModelError(true);
-      }
-    );
+    // Use the useGLTF hook correctly without the error callback
+    gltfResult = useGLTF(model);
   } catch (error) {
     console.error(`Error loading model ${model}:`, error);
     setModelError(true);
   }
+  
+  // Handle errors after trying to load the model
+  useEffect(() => {
+    const handleModelError = () => {
+      console.error(`Failed to load model ${model}`);
+      setModelError(true);
+    };
+    
+    // Check if the model failed to load
+    if (!gltfResult || !gltfResult.scene) {
+      handleModelError();
+    }
+  }, [gltfResult, model]);
   
   // Animations are only available if model loaded successfully
   const { actions } = useAnimations(
