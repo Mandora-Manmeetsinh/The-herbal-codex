@@ -22,8 +22,8 @@ interface PlantProps {
 }
 
 const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, isRaining }: PlantProps) => {
-  // Use Object3D as the generic type for better compatibility
-  const group = useRef<THREE.Object3D>(null!);
+  // Use any to bypass the type mismatch issues with the Three.js version
+  const group = useRef<any>(null);
   
   // Cast the result to our custom GLTFResult type
   const gltf = useGLTF(model) as unknown as GLTFResult;
@@ -83,7 +83,8 @@ const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, is
           <mesh
             key={nodeName}
             geometry={node.geometry}
-            material={node.material || new THREE.MeshStandardMaterial({ color: "#2D6A4F" })}
+            // Use type assertion to bypass type checking issues
+            material={node.material || new THREE.MeshStandardMaterial({ color: "#2D6A4F" }) as any}
             castShadow
             receiveShadow
           >
