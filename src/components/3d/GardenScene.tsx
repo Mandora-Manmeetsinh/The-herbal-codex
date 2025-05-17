@@ -131,8 +131,6 @@ const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
               color={plant.color}
             />
           ))}
-          
-          {/* Post-processing effects removed due to compatibility issues */}
         </Suspense>
       </Canvas>
     </div>

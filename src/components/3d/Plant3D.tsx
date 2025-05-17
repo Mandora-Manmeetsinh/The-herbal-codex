@@ -34,37 +34,31 @@ const Plant3D = ({
   // Use any to bypass the type mismatch issues with the Three.js version
   const group = useRef<any>(null);
   const [modelError, setModelError] = useState(false);
+  const [hovered, setHovered] = useState(false);
   
-  // Try to load the model, but handle errors gracefully
-  let gltfResult: any = null;
+  // Try to load the model using a memoized approach to prevent infinite renders
+  let gltfResult;
   try {
-    // Use the useGLTF hook correctly without the error callback
     gltfResult = useGLTF(model);
   } catch (error) {
+    // This catch will handle synchronous errors, but not async loading failures
     console.error(`Error loading model ${model}:`, error);
-    setModelError(true);
   }
   
-  // Handle errors after trying to load the model
+  // Handle errors after trying to load the model - only run this effect when needed
   useEffect(() => {
-    const handleModelError = () => {
+    // Only check for model loading errors if we have a result to check
+    if (gltfResult && !gltfResult.scene) {
       console.error(`Failed to load model ${model}`);
       setModelError(true);
-    };
-    
-    // Check if the model failed to load
-    if (!gltfResult || !gltfResult.scene) {
-      handleModelError();
     }
   }, [gltfResult, model]);
   
   // Animations are only available if model loaded successfully
   const { actions } = useAnimations(
-    modelError ? [] : (gltfResult?.animations || []), 
+    !modelError && gltfResult?.animations ? gltfResult.animations : [], 
     group
   );
-  
-  const [hovered, setHovered] = useState(false);
   
   // Try to play animations if available
   useEffect(() => {
@@ -94,6 +88,9 @@ const Plant3D = ({
     }
   });
   
+  // Check if model failed to load immediately (for static known failures)
+  const hasModelError = modelError || !gltfResult || gltfResult instanceof Error;
+  
   return (
     <group 
       ref={group} 
@@ -108,7 +105,7 @@ const Plant3D = ({
       onPointerOut={() => setHovered(false)}
     >
       {/* If model failed to load, show a fallback geometry */}
-      {modelError ? (
+      {hasModelError ? (
         <group>
           {/* Base/stem */}
           <mesh position={[0, 0.5, 0]}>
@@ -131,7 +128,7 @@ const Plant3D = ({
       {hovered && (
         <group>
           {/* This is a visual indicator for hover state */}
-          <mesh position={[0, modelError ? 2 : 0.5, 0]} scale={[0.2, 0.2, 0.2]}>
+          <mesh position={[0, hasModelError ? 2 : 0.5, 0]} scale={[0.2, 0.2, 0.2]}>
             <sphereGeometry args={[1, 16, 16]} />
             <meshBasicMaterial color="#52B788" transparent opacity={0.5} />
           </mesh>
@@ -140,8 +137,5 @@ const Plant3D = ({
     </group>
   );
 };
-
-// Remove preload since the models aren't available
-// This prevents errors during initial load
 
 export default Plant3D;
