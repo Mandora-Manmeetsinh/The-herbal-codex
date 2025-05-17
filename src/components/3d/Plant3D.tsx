@@ -26,14 +26,13 @@ const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, is
   const group = useRef<any>(null);
   
   // Cast the result to our custom GLTFResult type
-  const gltf = useGLTF(model) as unknown as GLTFResult;
-  const { nodes, materials, animations } = gltf;
+  const { scene, nodes, materials, animations } = useGLTF(model) as unknown as GLTFResult;
   
   const { actions } = useAnimations(animations, group);
   const [hovered, setHovered] = useState(false);
   
   useEffect(() => {
-    if (animations.length > 0 && actions) {
+    if (animations && animations.length > 0 && actions) {
       // Play the first animation if it exists
       const firstAnimation = Object.keys(actions)[0];
       if (firstAnimation) {
@@ -72,34 +71,19 @@ const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, is
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
-      {/* Render all meshes from the loaded model */}
-      {Object.keys(nodes).map((nodeName) => {
-        const node = nodes[nodeName];
-        
-        // Skip non-mesh objects or null nodes
-        if (!node || !(node instanceof THREE.Mesh)) return null;
-        
-        return (
-          <mesh
-            key={nodeName}
-            // Use type assertion to overcome the geometry type compatibility issue
-            geometry={(node.geometry as any)}
-            // Use type assertion to bypass type checking issues with materials
-            material={(node.material || new THREE.MeshStandardMaterial({ color: "#2D6A4F" })) as any}
-            castShadow
-            receiveShadow
-          >
-            {hovered && (
-              <meshStandardMaterial
-                attach="material"
-                color="#52B788"
-                emissive="#2D6A4F"
-                emissiveIntensity={0.5}
-              />
-            )}
+      {/* Use the scene directly instead of iterating through nodes */}
+      <primitive object={scene} />
+      
+      {/* Apply hover effect */}
+      {hovered && (
+        <group>
+          {/* This is a visual indicator for hover state */}
+          <mesh position={[0, 0.5, 0]} scale={[0.2, 0.2, 0.2]}>
+            <sphereGeometry args={[1, 16, 16]} />
+            <meshBasicMaterial color="#52B788" transparent opacity={0.5} />
           </mesh>
-        );
-      })}
+        </group>
+      )}
     </group>
   );
 };

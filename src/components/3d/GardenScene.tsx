@@ -2,7 +2,6 @@
 import { useState, useRef, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
-import { EffectComposer, Bloom, DepthOfField } from '@react-three/postprocessing';
 import Plant3D from './Plant3D';
 import Environment from './Environment';
 import LoadingScreen from '../ui/LoadingScreen';
@@ -127,16 +126,7 @@ const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
             />
           ))}
           
-          {/* Post-processing effects */}
-          <EffectComposer>
-            <Bloom luminanceThreshold={0.5} luminanceSmoothing={0.9} height={300} />
-            <DepthOfField 
-              focusDistance={0} 
-              focalLength={0.02} 
-              bokehScale={2} 
-              height={480} 
-            />
-          </EffectComposer>
+          {/* Post-processing effects removed due to compatibility issues */}
         </Suspense>
       </Canvas>
     </div>
