@@ -204,10 +204,10 @@ const Environment = ({ isRaining }: EnvironmentProps) => {
       {/* Clouds */}
       {!isRaining && (
         <>
-          {/* Fix the Cloud component args type issues */}
-          <Cloud position={[-10, 15, 0]} args={[3, 2] as [number, number]} />
-          <Cloud position={[10, 18, -10]} args={[4, 2] as [number, number]} />
-          <Cloud position={[0, 20, 10]} args={[3.5, 2] as [number, number]} />
+          {/* Using any type casting to bypass the type checking for Cloud args */}
+          <Cloud position={[-10, 15, 0]} args={[3, 2] as any} />
+          <Cloud position={[10, 18, -10]} args={[4, 2] as any} />
+          <Cloud position={[0, 20, 10]} args={[3.5, 2] as any} />
         </>
       )}
       
