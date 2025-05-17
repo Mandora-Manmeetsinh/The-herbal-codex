@@ -10,7 +10,8 @@ interface EnvironmentProps {
 
 const Environment = ({ isRaining }: EnvironmentProps) => {
   const { scene } = useThree();
-  const rainRef = useRef<THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial> | null>(null);
+  // Using a more generic Object3D type that's compatible with scene.add/remove
+  const rainRef = useRef<THREE.Object3D | null>(null);
   
   // Create rain particles
   useEffect(() => {
@@ -57,7 +58,9 @@ const Environment = ({ isRaining }: EnvironmentProps) => {
   // Animate rain falling
   useFrame(() => {
     if (rainRef.current && isRaining) {
-      const positions = rainRef.current.geometry.attributes.position.array as Float32Array;
+      // Type assertion to access the Points specific properties safely
+      const rainParticles = rainRef.current as THREE.Points;
+      const positions = rainParticles.geometry.attributes.position.array as Float32Array;
       
       for (let i = 1; i < positions.length; i += 3) {
         // Move rain down
@@ -69,7 +72,7 @@ const Environment = ({ isRaining }: EnvironmentProps) => {
         }
       }
       
-      rainRef.current.geometry.attributes.position.needsUpdate = true;
+      rainParticles.geometry.attributes.position.needsUpdate = true;
     }
   });
   

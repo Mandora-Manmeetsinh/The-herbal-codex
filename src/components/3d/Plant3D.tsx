@@ -3,16 +3,12 @@ import { useState, useRef, useEffect } from 'react';
 import { useGLTF, useAnimations } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import type { GLTF } from 'three-stdlib';
-import { Group, Mesh, Material } from 'three';
+import { GLTF } from 'three-stdlib';
 
+// Define more specific types for our GLTF result
 type GLTFResult = GLTF & {
-  nodes: {
-    [key: string]: THREE.Mesh;
-  };
-  materials: {
-    [key: string]: THREE.Material;
-  };
+  nodes: Record<string, THREE.Mesh>;
+  materials: Record<string, THREE.Material>;
   animations: THREE.AnimationClip[];
 };
 
@@ -26,8 +22,13 @@ interface PlantProps {
 }
 
 const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, isRaining }: PlantProps) => {
-  const group = useRef<Group>(null!);
-  const { nodes, materials, animations } = useGLTF(model) as GLTFResult;
+  // Use Object3D as the generic type for better compatibility
+  const group = useRef<THREE.Object3D>(null!);
+  
+  // Cast the result to our custom GLTFResult type
+  const gltf = useGLTF(model) as unknown as GLTFResult;
+  const { nodes, materials, animations } = gltf;
+  
   const { actions } = useAnimations(animations, group);
   const [hovered, setHovered] = useState(false);
   
@@ -75,8 +76,8 @@ const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, is
       {Object.keys(nodes).map((nodeName) => {
         const node = nodes[nodeName];
         
-        // Skip non-mesh objects
-        if (!(node instanceof THREE.Mesh)) return null;
+        // Skip non-mesh objects or null nodes
+        if (!node || !(node instanceof THREE.Mesh)) return null;
         
         return (
           <mesh
@@ -100,5 +101,12 @@ const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, is
     </group>
   );
 };
+
+// Add preload for better performance
+useGLTF.preload('/models/lavender.glb');
+useGLTF.preload('/models/aloe.glb');
+useGLTF.preload('/models/basil.glb');
+useGLTF.preload('/models/mint.glb');
+useGLTF.preload('/models/chamomile.glb');
 
 export default Plant3D;
