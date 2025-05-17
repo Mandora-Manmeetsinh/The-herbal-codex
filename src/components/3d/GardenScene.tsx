@@ -24,7 +24,8 @@ const plants = [
     description: "Known for its calming properties and beautiful purple flowers.",
     uses: "Sleep aid, anxiety relief, antiseptic, perfumes.",
     nativeRegions: "Mediterranean, Europe, Africa, Asia",
-    growingConditions: "Well-draining soil, full sun, moderate watering."
+    growingConditions: "Well-draining soil, full sun, moderate watering.",
+    color: "#a388e5" // Added color for fallback geometry
   },
   {
     id: 2,
@@ -37,7 +38,8 @@ const plants = [
     description: "Succulent plant with thick, fleshy leaves filled with gel.",
     uses: "Skin healing, burn treatment, digestive health.",
     nativeRegions: "Arabian Peninsula",
-    growingConditions: "Well-draining soil, partial sun, minimal water."
+    growingConditions: "Well-draining soil, partial sun, minimal water.",
+    color: "#7fcd91" // Added color for fallback geometry
   },
   {
     id: 3,
@@ -50,7 +52,8 @@ const plants = [
     description: "Aromatic herb with glossy green leaves.",
     uses: "Culinary herb, anti-inflammatory, antibacterial.",
     nativeRegions: "India, Southeast Asia",
-    growingConditions: "Rich soil, full sun, regular watering."
+    growingConditions: "Rich soil, full sun, regular watering.",
+    color: "#2d8a41" // Added color for fallback geometry
   },
   {
     id: 4,
@@ -63,7 +66,8 @@ const plants = [
     description: "Aromatic herb with serrated leaves and a cool flavor.",
     uses: "Digestive aid, breath freshener, flavoring.",
     nativeRegions: "Europe, Asia, Africa",
-    growingConditions: "Most soil types, partial to full sun, regular water."
+    growingConditions: "Most soil types, partial to full sun, regular water.",
+    color: "#5fb977" // Added color for fallback geometry
   },
   {
     id: 5,
@@ -76,7 +80,8 @@ const plants = [
     description: "Daisy-like flowers with a sweet, apple-like scent.",
     uses: "Sleep aid, anti-anxiety, skin soothing.",
     nativeRegions: "Europe, Western Asia",
-    growingConditions: "Well-draining soil, full sun, moderate water."
+    growingConditions: "Well-draining soil, full sun, moderate water.",
+    color: "#f8e16c" // Added color for fallback geometry
   }
 ];
 
@@ -123,6 +128,7 @@ const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
               model={plant.model}
               onClick={() => handlePlantClick(plant)}
               isRaining={isRaining}
+              color={plant.color}
             />
           ))}
           

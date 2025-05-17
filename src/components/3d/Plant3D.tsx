@@ -19,27 +19,55 @@ interface PlantProps {
   model: string;
   onClick: () => void;
   isRaining: boolean;
+  color?: string; // Added color prop for fallback geometry
 }
 
-const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, isRaining }: PlantProps) => {
+const Plant3D = ({ 
+  position, 
+  rotation = [0, 0, 0], 
+  scale = 1, 
+  model, 
+  onClick, 
+  isRaining, 
+  color = "#2D6A4F" // Default color if none provided
+}: PlantProps) => {
   // Use any to bypass the type mismatch issues with the Three.js version
   const group = useRef<any>(null);
+  const [modelError, setModelError] = useState(false);
   
-  // Cast the result to our custom GLTFResult type
-  const { scene, nodes, materials, animations } = useGLTF(model) as unknown as GLTFResult;
+  // Try to load the model, but handle errors gracefully
+  let gltfResult: any = null;
+  try {
+    // Try to load the model, wrapped in try-catch to handle errors
+    gltfResult = useGLTF(model, undefined, 
+      (error) => {
+        console.error(`Failed to load model ${model}:`, error);
+        setModelError(true);
+      }
+    );
+  } catch (error) {
+    console.error(`Error loading model ${model}:`, error);
+    setModelError(true);
+  }
   
-  const { actions } = useAnimations(animations, group);
+  // Animations are only available if model loaded successfully
+  const { actions } = useAnimations(
+    modelError ? [] : (gltfResult?.animations || []), 
+    group
+  );
+  
   const [hovered, setHovered] = useState(false);
   
+  // Try to play animations if available
   useEffect(() => {
-    if (animations && animations.length > 0 && actions) {
+    if (!modelError && gltfResult?.animations && gltfResult.animations.length > 0 && actions) {
       // Play the first animation if it exists
       const firstAnimation = Object.keys(actions)[0];
       if (firstAnimation) {
         actions[firstAnimation]?.play();
       }
     }
-  }, [actions, animations]);
+  }, [actions, modelError, gltfResult]);
   
   // Handle hover effect
   useEffect(() => {
@@ -71,14 +99,31 @@ const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, is
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
-      {/* Use the scene directly instead of iterating through nodes */}
-      <primitive object={scene} />
+      {/* If model failed to load, show a fallback geometry */}
+      {modelError ? (
+        <group>
+          {/* Base/stem */}
+          <mesh position={[0, 0.5, 0]}>
+            <cylinderGeometry args={[0.2, 0.2, 1, 8]} />
+            <meshStandardMaterial color="#3e8948" />
+          </mesh>
+          
+          {/* Plant top/leaves/flower */}
+          <mesh position={[0, 1.2, 0]}>
+            <sphereGeometry args={[0.8, 16, 16]} />
+            <meshStandardMaterial color={color} />
+          </mesh>
+        </group>
+      ) : (
+        /* If model loaded successfully, show it */
+        <primitive object={gltfResult?.scene} />
+      )}
       
       {/* Apply hover effect */}
       {hovered && (
         <group>
           {/* This is a visual indicator for hover state */}
-          <mesh position={[0, 0.5, 0]} scale={[0.2, 0.2, 0.2]}>
+          <mesh position={[0, modelError ? 2 : 0.5, 0]} scale={[0.2, 0.2, 0.2]}>
             <sphereGeometry args={[1, 16, 16]} />
             <meshBasicMaterial color="#52B788" transparent opacity={0.5} />
           </mesh>
@@ -88,11 +133,7 @@ const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, is
   );
 };
 
-// Add preload for better performance
-useGLTF.preload('/models/lavender.glb');
-useGLTF.preload('/models/aloe.glb');
-useGLTF.preload('/models/basil.glb');
-useGLTF.preload('/models/mint.glb');
-useGLTF.preload('/models/chamomile.glb');
+// Remove preload since the models aren't available
+// This prevents errors during initial load
 
 export default Plant3D;
