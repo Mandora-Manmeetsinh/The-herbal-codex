@@ -82,9 +82,10 @@ const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, is
         return (
           <mesh
             key={nodeName}
-            geometry={node.geometry}
-            // Use type assertion to bypass type checking issues
-            material={node.material || new THREE.MeshStandardMaterial({ color: "#2D6A4F" }) as any}
+            // Use type assertion to overcome the geometry type compatibility issue
+            geometry={(node.geometry as any)}
+            // Use type assertion to bypass type checking issues with materials
+            material={(node.material || new THREE.MeshStandardMaterial({ color: "#2D6A4F" })) as any}
             castShadow
             receiveShadow
           >

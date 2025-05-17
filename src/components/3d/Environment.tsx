@@ -42,15 +42,16 @@ const Environment = ({ isRaining }: EnvironmentProps) => {
       
       const rain = new THREE.Points(geometry, material);
       rainRef.current = rain;
-      scene.add(rain);
+      // Use type assertion to overcome the type incompatibility
+      (scene as any).add(rain);
     } else if (rainRef.current) {
-      scene.remove(rainRef.current);
+      (scene as any).remove(rainRef.current);
       rainRef.current = null;
     }
     
     return () => {
       if (rainRef.current) {
-        scene.remove(rainRef.current);
+        (scene as any).remove(rainRef.current);
       }
     };
   }, [isRaining, scene]);
