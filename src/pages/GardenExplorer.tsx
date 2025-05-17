@@ -33,11 +33,11 @@ const GardenExplorer = () => {
         {showInstructions && (
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/50 p-5 rounded-lg text-white text-center max-w-md">
             <h2 className="text-xl font-bold mb-3">Welcome to the Herb Garden</h2>
-            <p className="mb-4">Explore our medicinal herb garden using the character controls.</p>
+            <p className="mb-4">Explore our medicinal herb garden in 3D.</p>
             <ul className="text-left space-y-2 mb-4">
-              <li>🔤 <span className="font-medium">WASD or Arrow keys</span>: Move your character</li>
               <li>🖱️ <span className="font-medium">Mouse drag</span>: Rotate camera view</li>
-              <li>👋 <span className="font-medium">Walk near plants</span>: Touch to learn about them</li>
+              <li>🔍 <span className="font-medium">Scroll wheel</span>: Zoom in/out</li>
+              <li>🌱 <span className="font-medium">Click on plants</span>: Learn about them</li>
               <li>☁️ <span className="font-medium">Weather toggle</span>: Experience different conditions</li>
             </ul>
             <button 
@@ -51,7 +51,7 @@ const GardenExplorer = () => {
         
         <div className="absolute bottom-8 left-0 w-full text-center pointer-events-none">
           <p className="text-sm bg-black/30 inline-block px-3 py-1 rounded-full text-white">
-            Use WASD or Arrow keys to move | Click plants or walk near them to learn more
+            Click plants to learn more about them | Use mouse to rotate and zoom
           </p>
         </div>
       </div>

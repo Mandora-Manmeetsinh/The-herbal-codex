@@ -104,28 +104,6 @@ const Environment = ({ isRaining }: EnvironmentProps) => {
       );
     }
     
-    // Add rocks
-    for (let i = 0; i < 14; i++) {
-      const x = (Math.random() - 0.5) * 18;
-      const z = (Math.random() - 0.5) * 18;
-      // Keep rocks away from center path
-      if (Math.abs(x) < 2 && Math.abs(z) < 2) continue;
-      
-      elements.push(
-        <mesh 
-          key={`rock-${i}`} 
-          position={[x, -0.25 + Math.random() * 0.2, z]} 
-          rotation={[Math.random(), Math.random(), Math.random()]}
-          scale={0.3 + Math.random() * 0.5}
-          castShadow 
-          receiveShadow
-        >
-          <dodecahedronGeometry args={[1, 0]} />
-          <meshStandardMaterial color={`rgb(${150 + Math.random() * 50}, ${150 + Math.random() * 50}, ${150 + Math.random() * 50})`} roughness={0.8} />
-        </mesh>
-      );
-    }
-    
     // Add garden benches
     const benchPositions = [
       [4, 0, -6],

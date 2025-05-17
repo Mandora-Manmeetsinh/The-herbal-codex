@@ -1,11 +1,9 @@
-
 import { useState, useRef, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Sky } from '@react-three/drei';
 import Plant3D from './Plant3D';
 import Environment from './Environment';
 import LoadingScreen from '../ui/LoadingScreen';
-import GardenCharacter from './GardenCharacter';
 
 interface GardenSceneProps {
   onPlantSelect: (plantData: any) => void;
@@ -197,7 +195,6 @@ const gardenPaths = [
 
 const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
   const controlsRef = useRef(null);
-  const [characterPosition, setCharacterPosition] = useState<[number, number, number]>([0, 0, 5]);
   const [activePlant, setActivePlant] = useState<number | null>(null);
   
   const handlePlantClick = (plant: any) => {
@@ -212,24 +209,6 @@ const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
         plant.position[2]
       );
     }
-  };
-
-  const handleCharacterMove = (newPosition: [number, number, number]) => {
-    setCharacterPosition(newPosition);
-    
-    // Check if character is near any plant (for touch interaction)
-    plants.forEach(plant => {
-      const dx = newPosition[0] - plant.position[0];
-      const dz = newPosition[2] - plant.position[2];
-      const distanceSquared = dx * dx + dz * dz;
-      
-      // If character is within 1 unit of a plant, consider it "touching"
-      if (distanceSquared < 1) {
-        if (activePlant !== plant.id) {
-          handlePlantClick(plant);
-        }
-      }
-    });
   };
   
   return (
@@ -257,7 +236,6 @@ const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
               rotation={path.rotation as [number, number, number]}
               receiveShadow
             >
-              {/* Fixed: Specify the correct tuple type for boxGeometry args */}
               <boxGeometry args={[path.scale[0], path.scale[1], path.scale[2]]} />
               <meshStandardMaterial color="#e0d2bc" roughness={0.9} />
             </mesh>
@@ -282,21 +260,8 @@ const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
               color={plant.color}
             />
           ))}
-          
-          {/* User character that can walk in the garden */}
-          <GardenCharacter 
-            position={characterPosition} 
-            onMove={handleCharacterMove}
-          />
         </Suspense>
       </Canvas>
-      
-      {/* Controls help */}
-      <div className="absolute bottom-16 left-0 w-full text-center text-white pointer-events-none">
-        <p className="text-sm bg-black/30 inline-block px-3 py-1 rounded-full">
-          Use WASD or arrow keys to move character | Walk near plants to interact
-        </p>
-      </div>
     </div>
   );
 };
