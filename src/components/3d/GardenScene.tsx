@@ -1,31 +1,32 @@
 
 import { useState, useRef, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, Sky } from '@react-three/drei';
 import Plant3D from './Plant3D';
 import Environment from './Environment';
 import LoadingScreen from '../ui/LoadingScreen';
+import GardenCharacter from './GardenCharacter';
 
 interface GardenSceneProps {
   onPlantSelect: (plantData: any) => void;
   isRaining: boolean;
 }
 
-// Sample plant data - in a real app, this would come from an API or database
+// Expanded plant data with more variety and garden-like arrangement
 const plants = [
   {
     id: 1,
     name: "Lavender",
     scientificName: "Lavandula angustifolia",
-    model: "/models/lavender.glb", // Example path, would need actual models
-    position: [0, 0, 0] as [number, number, number],
-    rotation: [0, 0, 0] as [number, number, number],
+    model: "/models/lavender.glb",
+    position: [-4, 0, -3] as [number, number, number],
+    rotation: [0, Math.random() * Math.PI, 0] as [number, number, number],
     scale: 1,
     description: "Known for its calming properties and beautiful purple flowers.",
     uses: "Sleep aid, anxiety relief, antiseptic, perfumes.",
     nativeRegions: "Mediterranean, Europe, Africa, Asia",
     growingConditions: "Well-draining soil, full sun, moderate watering.",
-    color: "#a388e5" // Added color for fallback geometry
+    color: "#a388e5"
   },
   {
     id: 2,
@@ -39,7 +40,7 @@ const plants = [
     uses: "Skin healing, burn treatment, digestive health.",
     nativeRegions: "Arabian Peninsula",
     growingConditions: "Well-draining soil, partial sun, minimal water.",
-    color: "#7fcd91" // Added color for fallback geometry
+    color: "#7fcd91"
   },
   {
     id: 3,
@@ -53,7 +54,7 @@ const plants = [
     uses: "Culinary herb, anti-inflammatory, antibacterial.",
     nativeRegions: "India, Southeast Asia",
     growingConditions: "Rich soil, full sun, regular watering.",
-    color: "#2d8a41" // Added color for fallback geometry
+    color: "#2d8a41"
   },
   {
     id: 4,
@@ -67,7 +68,7 @@ const plants = [
     uses: "Digestive aid, breath freshener, flavoring.",
     nativeRegions: "Europe, Asia, Africa",
     growingConditions: "Most soil types, partial to full sun, regular water.",
-    color: "#5fb977" // Added color for fallback geometry
+    color: "#5fb977"
   },
   {
     id: 5,
@@ -81,15 +82,127 @@ const plants = [
     uses: "Sleep aid, anti-anxiety, skin soothing.",
     nativeRegions: "Europe, Western Asia",
     growingConditions: "Well-draining soil, full sun, moderate water.",
-    color: "#f8e16c" // Added color for fallback geometry
+    color: "#f8e16c"
+  },
+  // Additional plants to make the garden richer
+  {
+    id: 6,
+    name: "Rosemary",
+    scientificName: "Rosmarinus officinalis",
+    model: "/models/basil.glb", // Reusing model as fallback
+    position: [4, 0, 4] as [number, number, number],
+    rotation: [0, Math.random() * Math.PI, 0] as [number, number, number],
+    scale: 0.85,
+    description: "Fragrant evergreen herb with needle-like leaves.",
+    uses: "Culinary herb, memory enhancement, hair growth.",
+    nativeRegions: "Mediterranean",
+    growingConditions: "Well-draining soil, full sun, drought tolerant.",
+    color: "#3a5f42"
+  },
+  {
+    id: 7,
+    name: "Sage",
+    scientificName: "Salvia officinalis",
+    model: "/models/lavender.glb", // Reusing model as fallback
+    position: [-5, 0, 1] as [number, number, number],
+    rotation: [0, Math.random() * Math.PI, 0] as [number, number, number],
+    scale: 0.75,
+    description: "Gray-green herb with soft, fuzzy leaves.",
+    uses: "Cooking, sore throat relief, antibacterial properties.",
+    nativeRegions: "Mediterranean, Balkan Peninsula",
+    growingConditions: "Well-draining soil, full sun, drought tolerant.",
+    color: "#8ca9a3"
+  },
+  {
+    id: 8,
+    name: "Lemon Balm",
+    scientificName: "Melissa officinalis",
+    model: "/models/mint.glb", // Reusing model as fallback
+    position: [5, 0, -3] as [number, number, number],
+    rotation: [0, Math.random() * Math.PI, 0] as [number, number, number],
+    scale: 0.7,
+    description: "Lemon-scented herb with serrated leaves.",
+    uses: "Calming tea, insect repellent, antiviral properties.",
+    nativeRegions: "South-central Europe, Mediterranean, Central Asia",
+    growingConditions: "Rich soil, partial shade, regular water.",
+    color: "#97c08d"
+  },
+  {
+    id: 9,
+    name: "Thyme",
+    scientificName: "Thymus vulgaris",
+    model: "/models/basil.glb", // Reusing model as fallback
+    position: [-1, 0, 5] as [number, number, number],
+    rotation: [0, Math.random() * Math.PI, 0] as [number, number, number],
+    scale: 0.6,
+    description: "Small, aromatic herb with tiny leaves.",
+    uses: "Cooking, cough relief, antiseptic properties.",
+    nativeRegions: "Southern Europe, Mediterranean",
+    growingConditions: "Well-draining soil, full sun, drought tolerant.",
+    color: "#5c7f59"
+  },
+  {
+    id: 10,
+    name: "Echinacea",
+    scientificName: "Echinacea purpurea",
+    model: "/models/chamomile.glb", // Reusing model as fallback
+    position: [0, 0, -5] as [number, number, number],
+    rotation: [0, Math.random() * Math.PI, 0] as [number, number, number],
+    scale: 1.1,
+    description: "Daisy-like flowers with raised, cone-shaped centers.",
+    uses: "Immune support, anti-inflammatory, wound healing.",
+    nativeRegions: "North America",
+    growingConditions: "Well-draining soil, full to partial sun, moderate water.",
+    color: "#d48cb3"
+  },
+  {
+    id: 11,
+    name: "Calendula",
+    scientificName: "Calendula officinalis",
+    model: "/models/chamomile.glb", // Reusing model as fallback
+    position: [6, 0, 0] as [number, number, number],
+    rotation: [0, Math.random() * Math.PI, 0] as [number, number, number],
+    scale: 0.95,
+    description: "Bright orange or yellow daisy-like flowers.",
+    uses: "Skin healing, anti-inflammatory, wound treatment.",
+    nativeRegions: "Southern Europe, Mediterranean, Middle East",
+    growingConditions: "Well-draining soil, full sun, moderate water.",
+    color: "#ffb74d"
+  },
+  {
+    id: 12,
+    name: "Feverfew",
+    scientificName: "Tanacetum parthenium",
+    model: "/models/chamomile.glb", // Reusing model as fallback
+    position: [-6, 0, -4] as [number, number, number],
+    rotation: [0, Math.random() * Math.PI, 0] as [number, number, number],
+    scale: 0.8,
+    description: "Small daisy-like flowers with yellow centers.",
+    uses: "Headache relief, migraine prevention, anti-inflammatory.",
+    nativeRegions: "Southeastern Europe",
+    growingConditions: "Well-draining soil, full sun to partial shade, moderate water.",
+    color: "#ffffff"
   }
+];
+
+// Create garden paths and clusters
+const gardenPaths = [
+  // Main path
+  { position: [0, -0.49, 0], rotation: [0, 0, 0], scale: [2, 0.1, 8] },
+  // Crossing path
+  { position: [0, -0.49, 0], rotation: [0, Math.PI/2, 0], scale: [2, 0.1, 12] },
+  // Small corner path
+  { position: [4, -0.49, 4], rotation: [0, Math.PI/4, 0], scale: [1, 0.1, 3] }
 ];
 
 const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
   const controlsRef = useRef(null);
+  const [characterPosition, setCharacterPosition] = useState<[number, number, number]>([0, 0, 5]);
+  const [activePlant, setActivePlant] = useState<number | null>(null);
   
   const handlePlantClick = (plant: any) => {
     onPlantSelect(plant);
+    setActivePlant(plant.id);
     
     // Move camera slightly toward the selected plant
     if (controlsRef.current) {
@@ -99,6 +212,24 @@ const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
         plant.position[2]
       );
     }
+  };
+
+  const handleCharacterMove = (newPosition: [number, number, number]) => {
+    setCharacterPosition(newPosition);
+    
+    // Check if character is near any plant (for touch interaction)
+    plants.forEach(plant => {
+      const dx = newPosition[0] - plant.position[0];
+      const dz = newPosition[2] - plant.position[2];
+      const distanceSquared = dx * dx + dz * dz;
+      
+      // If character is within 1 unit of a plant, consider it "touching"
+      if (distanceSquared < 1) {
+        if (activePlant !== plant.id) {
+          handlePlantClick(plant);
+        }
+      }
+    });
   };
   
   return (
@@ -118,6 +249,25 @@ const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
           
           <Environment isRaining={isRaining} />
           
+          {/* Garden paths */}
+          {gardenPaths.map((path, idx) => (
+            <mesh 
+              key={`path-${idx}`} 
+              position={path.position as [number, number, number]} 
+              rotation={path.rotation as [number, number, number]}
+              receiveShadow
+            >
+              <boxGeometry args={path.scale} />
+              <meshStandardMaterial color="#e0d2bc" roughness={0.9} />
+            </mesh>
+          ))}
+          
+          {/* Garden border/edging */}
+          <mesh position={[0, -0.45, 0]} receiveShadow>
+            <torusGeometry args={[9, 0.3, 8, 36]} />
+            <meshStandardMaterial color="#8B4513" roughness={0.8} />
+          </mesh>
+          
           {/* Plants */}
           {plants.map((plant) => (
             <Plant3D
@@ -131,8 +281,21 @@ const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
               color={plant.color}
             />
           ))}
+          
+          {/* User character that can walk in the garden */}
+          <GardenCharacter 
+            position={characterPosition} 
+            onMove={handleCharacterMove}
+          />
         </Suspense>
       </Canvas>
+      
+      {/* Controls help */}
+      <div className="absolute bottom-16 left-0 w-full text-center text-white pointer-events-none">
+        <p className="text-sm bg-black/30 inline-block px-3 py-1 rounded-full">
+          Use WASD or arrow keys to move character | Walk near plants to interact
+        </p>
+      </div>
     </div>
   );
 };
