@@ -10,7 +10,7 @@ interface EnvironmentProps {
 
 const Environment = ({ isRaining }: EnvironmentProps) => {
   const { scene } = useThree();
-  const rainRef = useRef<THREE.Points | null>(null);
+  const rainRef = useRef<THREE.Points<THREE.BufferGeometry, THREE.PointsMaterial> | null>(null);
   
   // Create rain particles
   useEffect(() => {

@@ -4,6 +4,7 @@ import { useGLTF, useAnimations } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { GLTF } from 'three-stdlib';
+import { Group, Mesh, Material } from 'three';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -25,7 +26,7 @@ interface PlantProps {
 }
 
 const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, isRaining }: PlantProps) => {
-  const group = useRef<THREE.Group>(null);
+  const group = useRef<Group>(null!);
   const { nodes, materials, animations } = useGLTF(model) as GLTFResult;
   const { actions } = useAnimations(animations, group);
   const [hovered, setHovered] = useState(false);
@@ -81,15 +82,15 @@ const Plant3D = ({ position, rotation = [0, 0, 0], scale = 1, model, onClick, is
           <mesh
             key={nodeName}
             geometry={node.geometry}
-            material={node.material || new THREE.MeshStandardMaterial({ color: 0x2D6A4F })}
+            material={node.material || new THREE.MeshStandardMaterial({ color: "#2D6A4F" })}
             castShadow
             receiveShadow
           >
             {hovered && (
               <meshStandardMaterial
                 attach="material"
-                color={new THREE.Color("#52B788")}
-                emissive={new THREE.Color("#2D6A4F")}
+                color="#52B788"
+                emissive="#2D6A4F"
                 emissiveIntensity={0.5}
               />
             )}
