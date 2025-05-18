@@ -116,6 +116,22 @@ export default {
 					"50%": {
 						transform: "rotate(3deg)"
 					}
+				},
+				"pulse-glow": {
+					"0%, 100%": {
+						boxShadow: "0 0 5px rgba(82, 183, 136, 0.2), 0 0 10px rgba(82, 183, 136, 0.2)"
+					},
+					"50%": {
+						boxShadow: "0 0 10px rgba(82, 183, 136, 0.5), 0 0 20px rgba(82, 183, 136, 0.3)"
+					}
+				},
+				"rotate-slow": {
+					"0%": {
+						transform: "rotate(0deg)"
+					},
+					"100%": {
+						transform: "rotate(360deg)"
+					}
 				}
 			},
 			animation: {
@@ -123,11 +139,24 @@ export default {
 				"accordion-up": "accordion-up 0.2s ease-out",
 				"fade-in": "fade-in 0.5s ease-out",
 				"float": "float 6s ease-in-out infinite",
-				"sway": "sway 8s ease-in-out infinite"
+				"sway": "sway 8s ease-in-out infinite",
+				"pulse-glow": "pulse-glow 3s ease-in-out infinite",
+				"rotate-slow": "rotate-slow 12s linear infinite"
 			},
 			backgroundImage: {
 				'hero-pattern': "url('/herbs-bg.jpg')",
 				'paper-texture': "url('/paper-texture.png')",
+				'leaf-pattern': "url('/leaf-pattern.svg')",
+			},
+			transitionDelay: {
+				'400': '400ms',
+				'600': '600ms',
+				'800': '800ms',
+				'900': '900ms',
+				'1100': '1100ms',
+				'1200': '1200ms',
+				'1500': '1500ms',
+				'2000': '2000ms',
 			}
 		}
 	},

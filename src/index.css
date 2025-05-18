@@ -103,11 +103,11 @@
 
 @layer components {
   .herb-card {
-    @apply bg-white bg-opacity-90 rounded-lg shadow-lg overflow-hidden border border-herb-green-light;
+    @apply bg-white bg-opacity-90 rounded-lg shadow-lg overflow-hidden border border-herb-green-light/30 hover:shadow-xl transition-all duration-300;
   }
   
   .herb-button {
-    @apply bg-herb-green text-white px-6 py-3 rounded-md hover:bg-herb-green-dark transition-colors font-medium;
+    @apply bg-herb-green text-white px-6 py-3 rounded-md hover:bg-herb-green-dark transition duration-300 font-medium relative overflow-hidden;
   }
   
   .herb-section {
@@ -115,6 +115,71 @@
   }
 }
 
+/* Enhanced animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-sway {
+  animation: sway 8s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
+}
+
+.animation-delay-100 { animation-delay: 0.1s; }
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-300 { animation-delay: 0.3s; }
+.animation-delay-400 { animation-delay: 0.4s; }
+.animation-delay-500 { animation-delay: 0.5s; }
+
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-400 { transition-delay: 400ms; }
+.delay-500 { transition-delay: 500ms; }
+
+/* Glass effect */
+.glass-effect {
+  @apply bg-white bg-opacity-20 backdrop-blur-lg border border-white border-opacity-20;
+}
+
+/* Scrollbar styling */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* 3D Garden styles */
 .three-loading {
   position: absolute;
   top: 0;
@@ -164,4 +229,9 @@
   bottom: 20px;
   left: 20px;
   z-index: 10;
+}
+
+/* Perspective for 3D card effects */
+.perspective {
+  perspective: 1000px;
 }
