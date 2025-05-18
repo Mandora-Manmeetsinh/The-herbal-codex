@@ -5,22 +5,31 @@ import GardenScene from '../components/3d/GardenScene';
 import PlantInfoPanel from '../components/ui/PlantInfoPanel';
 import WeatherToggle from '../components/ui/WeatherToggle';
 import ZoneSelector from '../components/ui/ZoneSelector';
+import SymptomFinder from '../components/ui/SymptomFinder';
+import { Sun, Moon, Cloud, CloudRain } from 'lucide-react';
 import { zones } from '@/data/zones';
 
 const GardenExplorer = () => {
   const [selectedPlant, setSelectedPlant] = useState<any | null>(null);
   const [isRaining, setIsRaining] = useState(false);
+  const [isNightMode, setIsNightMode] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
   const [currentZone, setCurrentZone] = useState("ayurvedic"); // Default zone
   const [isZoneChanging, setIsZoneChanging] = useState(false);
+  const [showSymptomFinder, setShowSymptomFinder] = useState(false);
   
   const handlePlantSelect = (plant: any) => {
     setSelectedPlant(plant);
     setShowInstructions(false);
+    setShowSymptomFinder(false);
   };
   
   const handleWeatherToggle = () => {
     setIsRaining(!isRaining);
+  };
+
+  const handleDayNightToggle = () => {
+    setIsNightMode(!isNightMode);
   };
   
   const handleZoneChange = (zoneId: string) => {
@@ -31,6 +40,13 @@ const GardenExplorer = () => {
       setIsZoneChanging(false);
     }, 1000);
   };
+
+  const toggleSymptomFinder = () => {
+    setShowSymptomFinder(!showSymptomFinder);
+    if (!showSymptomFinder) {
+      setSelectedPlant(null);
+    }
+  };
   
   // Find the current zone object
   const activeZone = zones.find(zone => zone.id === currentZone) || zones[0];
@@ -40,7 +56,8 @@ const GardenExplorer = () => {
       <div className="relative w-full h-screen">
         <GardenScene 
           onPlantSelect={handlePlantSelect} 
-          isRaining={isRaining} 
+          isRaining={isRaining}
+          isNightMode={isNightMode}
           currentZoneId={currentZone}
           isZoneChanging={isZoneChanging}
         />
@@ -50,10 +67,55 @@ const GardenExplorer = () => {
           onZoneSelect={handleZoneChange}
         />
         
-        <WeatherToggle isRaining={isRaining} onToggle={handleWeatherToggle} />
+        <div className="absolute top-4 right-4 flex flex-col space-y-2">
+          {/* Weather toggle */}
+          <button 
+            onClick={handleWeatherToggle}
+            className="p-3 rounded-full bg-white shadow-lg hover:bg-herb-cream transition-colors"
+            aria-label={isRaining ? "Switch to sunny weather" : "Switch to rainy weather"}
+          >
+            {isRaining ? (
+              <Cloud className="text-herb-green-dark" size={24} />
+            ) : (
+              <CloudRain className="text-herb-green" size={24} />
+            )}
+          </button>
+          
+          {/* Day/Night toggle */}
+          <button 
+            onClick={handleDayNightToggle}
+            className="p-3 rounded-full bg-white shadow-lg hover:bg-herb-cream transition-colors"
+            aria-label={isNightMode ? "Switch to day mode" : "Switch to night mode"}
+          >
+            {isNightMode ? (
+              <Sun className="text-herb-gold" size={24} />
+            ) : (
+              <Moon className="text-herb-green-dark" size={24} />
+            )}
+          </button>
+        </div>
+
+        {/* Symptom Finder Toggle Button */}
+        <button
+          onClick={toggleSymptomFinder}
+          className={`absolute bottom-4 right-4 p-3 rounded-full shadow-lg transition-colors ${showSymptomFinder ? 'bg-herb-green text-white' : 'bg-white text-herb-green-dark'}`}
+          aria-label="Find herbs by symptom"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.3-4.3"/>
+          </svg>
+        </button>
         
         {selectedPlant && (
           <PlantInfoPanel plant={selectedPlant} onClose={() => setSelectedPlant(null)} />
+        )}
+
+        {showSymptomFinder && (
+          <SymptomFinder 
+            onPlantSelect={handlePlantSelect}
+            onClose={() => setShowSymptomFinder(false)}
+          />
         )}
         
         {showInstructions && (
@@ -65,7 +127,9 @@ const GardenExplorer = () => {
               <li>🔍 <span className="font-medium">Scroll wheel</span>: Zoom in/out</li>
               <li>🌱 <span className="font-medium">Click on plants</span>: Learn about them</li>
               <li>🧭 <span className="font-medium">Zone selector</span>: Visit different garden areas</li>
-              <li>☁️ <span className="font-medium">Weather toggle</span>: Experience different conditions</li>
+              <li>☁️ <span className="font-medium">Weather toggle</span>: Change weather conditions</li>
+              <li>🌙 <span className="font-medium">Day/Night toggle</span>: Change time of day</li>
+              <li>🔎 <span className="font-medium">Symptom finder</span>: Find herbs for specific ailments</li>
             </ul>
             <button 
               className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-full transition-colors"

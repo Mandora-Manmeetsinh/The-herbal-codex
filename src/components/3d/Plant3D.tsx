@@ -19,6 +19,7 @@ interface PlantProps {
   model: string;
   onClick: () => void;
   isRaining: boolean;
+  isNightMode: boolean;
   color?: string; // Added color prop for fallback geometry
 }
 
@@ -28,7 +29,8 @@ const Plant3D = ({
   scale = 1, 
   model, 
   onClick, 
-  isRaining, 
+  isRaining,
+  isNightMode,
   color = "#2D6A4F" // Default color if none provided
 }: PlantProps) => {
   // Use any to bypass the type mismatch issues with the Three.js version
@@ -90,6 +92,14 @@ const Plant3D = ({
   
   // Check if model failed to load immediately (for static known failures)
   const hasModelError = modelError || !gltfResult || gltfResult instanceof Error;
+
+  // Adjust color based on night mode
+  const plantColor = isNightMode 
+    ? new THREE.Color(color).multiplyScalar(0.5).getHexString() // Darker at night
+    : color;
+  
+  // Visual effects for night mode
+  const emissiveIntensity = isNightMode ? 0.2 : 0;
   
   return (
     <group 
@@ -110,18 +120,55 @@ const Plant3D = ({
           {/* Base/stem */}
           <mesh position={[0, 0.5, 0]}>
             <cylinderGeometry args={[0.2, 0.2, 1, 8]} />
-            <meshStandardMaterial color="#3e8948" />
+            <meshStandardMaterial 
+              color="#3e8948" 
+              emissive={isNightMode ? "#1a2e18" : "#000000"} 
+              emissiveIntensity={emissiveIntensity}
+            />
           </mesh>
           
           {/* Plant top/leaves/flower */}
           <mesh position={[0, 1.2, 0]}>
             <sphereGeometry args={[0.8, 16, 16]} />
-            <meshStandardMaterial color={color} />
+            <meshStandardMaterial 
+              color={plantColor} 
+              emissive={isNightMode ? plantColor : "#000000"} 
+              emissiveIntensity={emissiveIntensity}
+            />
           </mesh>
         </group>
       ) : (
-        /* If model loaded successfully, show it */
-        <primitive object={gltfResult?.scene} />
+        /* If model loaded successfully, show it with adjusted materials for night mode */
+        <primitive 
+          object={gltfResult?.scene} 
+          // Apply night mode effect to loaded model
+          onAfterRender={() => {
+            if (isNightMode && gltfResult?.scene) {
+              gltfResult.scene.traverse((child: any) => {
+                if (child.isMesh && child.material) {
+                  // Store original colors if not already stored
+                  if (!child.userData.originalColor) {
+                    child.userData.originalColor = child.material.color.clone();
+                  }
+                  
+                  if (isNightMode) {
+                    // Darken the color for night mode
+                    child.material.color.copy(child.userData.originalColor).multiplyScalar(0.5);
+                    child.material.emissive = new THREE.Color(0x112211);
+                    child.material.emissiveIntensity = 0.2;
+                  } else {
+                    // Restore original color
+                    if (child.userData.originalColor) {
+                      child.material.color.copy(child.userData.originalColor);
+                      child.material.emissive = new THREE.Color(0x000000);
+                      child.material.emissiveIntensity = 0;
+                    }
+                  }
+                }
+              });
+            }
+          }}
+        />
       )}
       
       {/* Apply hover effect */}
@@ -132,6 +179,25 @@ const Plant3D = ({
             <sphereGeometry args={[1, 16, 16]} />
             <meshBasicMaterial color="#52B788" transparent opacity={0.5} />
           </mesh>
+        </group>
+      )}
+
+      {/* Add firefly effect at night */}
+      {isNightMode && (
+        <group>
+          {[...Array(3)].map((_, i) => (
+            <mesh 
+              key={`firefly-${i}`} 
+              position={[
+                Math.random() * 1.5 - 0.75, 
+                Math.random() * 1.5 + 0.5, 
+                Math.random() * 1.5 - 0.75
+              ]}
+            >
+              <sphereGeometry args={[0.03, 8, 8]} />
+              <meshBasicMaterial color="#FFD700" transparent opacity={0.7} />
+            </mesh>
+          ))}
         </group>
       )}
     </group>

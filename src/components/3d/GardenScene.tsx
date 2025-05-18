@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Sky } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, Sky, Stars } from '@react-three/drei';
 import Plant3D from './Plant3D';
 import Environment from './Environment';
 import LoadingScreen from '../ui/LoadingScreen';
@@ -9,6 +9,7 @@ import { getZoneById, zones } from '@/data/zones';
 interface GardenSceneProps {
   onPlantSelect: (plantData: any) => void;
   isRaining: boolean;
+  isNightMode: boolean;
   currentZoneId: string;
   isZoneChanging: boolean;
 }
@@ -250,7 +251,13 @@ const CameraController = ({ targetZoneId, isChanging }: { targetZoneId: string, 
   );
 };
 
-const GardenScene = ({ onPlantSelect, isRaining, currentZoneId, isZoneChanging }: GardenSceneProps) => {
+const GardenScene = ({ 
+  onPlantSelect, 
+  isRaining, 
+  isNightMode,
+  currentZoneId, 
+  isZoneChanging 
+}: GardenSceneProps) => {
   const [activePlant, setActivePlant] = useState<string | null>(null);
   
   // Get current zone data
@@ -275,7 +282,8 @@ const GardenScene = ({ onPlantSelect, isRaining, currentZoneId, isZoneChanging }
           <CameraController targetZoneId={currentZoneId} isChanging={isZoneChanging} />
           
           <Environment 
-            isRaining={isRaining} 
+            isRaining={isRaining}
+            isNightMode={isNightMode}
             zoneId={currentZoneId} 
             ambientLightColor={currentZone.ambientLight}
             groundColor={currentZone.groundColor}
@@ -318,6 +326,7 @@ const GardenScene = ({ onPlantSelect, isRaining, currentZoneId, isZoneChanging }
                 model={plant.model}
                 onClick={() => handlePlantClick(plant)}
                 isRaining={isRaining}
+                isNightMode={isNightMode}
                 color={plant.color}
               />
             );

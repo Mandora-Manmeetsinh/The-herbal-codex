@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { Sky, Environment as DreiEnvironment, Stars, Cloud } from '@react-three/drei';
@@ -7,15 +6,17 @@ import { getZoneById } from '@/data/zones';
 
 interface EnvironmentProps {
   isRaining: boolean;
+  isNightMode: boolean;
   zoneId: string;
   ambientLightColor: string;
   groundColor: string;
 }
 
-const Environment = ({ isRaining, zoneId, ambientLightColor, groundColor }: EnvironmentProps) => {
+const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, groundColor }: EnvironmentProps) => {
   const { scene } = useThree();
   // Use any to bypass the type mismatch issues with the Three.js version
   const rainRef = useRef<any>(null);
+  const firefliesRef = useRef<any>(null);
   
   // Current zone data
   const zoneData = getZoneById(zoneId);
@@ -63,8 +64,58 @@ const Environment = ({ isRaining, zoneId, ambientLightColor, groundColor }: Envi
     };
   }, [isRaining, scene]);
   
+  // Create fireflies for night mode
+  useEffect(() => {
+    if (isNightMode) {
+      // Create many small points of light that will be fireflies
+      const fireflyCount = 200;
+      const positions = new Float32Array(fireflyCount * 3);
+      const scales = new Float32Array(fireflyCount);
+      
+      for (let i = 0; i < fireflyCount * 3; i += 3) {
+        // Random positions spread around the scene
+        positions[i] = (Math.random() - 0.5) * 80;
+        positions[i + 1] = Math.random() * 10;  // Keep them low to the ground
+        positions[i + 2] = (Math.random() - 0.5) * 80;
+        
+        // Random scales for visual variety
+        scales[i/3] = Math.random() * 0.5 + 0.5;
+      }
+      
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('scale', new THREE.BufferAttribute(scales, 1));
+      
+      const material = new THREE.PointsMaterial({
+        color: 0xffcf75,
+        size: 0.15,
+        transparent: true,
+        opacity: 0.8,
+        blending: THREE.AdditiveBlending
+      });
+      
+      if (firefliesRef.current) {
+        (scene as any).remove(firefliesRef.current);
+      }
+      
+      const fireflies = new THREE.Points(geometry, material);
+      firefliesRef.current = fireflies;
+      (scene as any).add(fireflies);
+    } else if (firefliesRef.current) {
+      (scene as any).remove(firefliesRef.current);
+      firefliesRef.current = null;
+    }
+    
+    return () => {
+      if (firefliesRef.current) {
+        (scene as any).remove(firefliesRef.current);
+      }
+    };
+  }, [isNightMode, scene]);
+  
   // Animate rain falling
-  useFrame(() => {
+  useFrame(({ clock }) => {
+    // Rain animation
     if (rainRef.current && isRaining) {
       const positions = rainRef.current.geometry.attributes.position.array as Float32Array;
       
@@ -79,6 +130,26 @@ const Environment = ({ isRaining, zoneId, ambientLightColor, groundColor }: Envi
       }
       
       rainRef.current.geometry.attributes.position.needsUpdate = true;
+    }
+    
+    // Firefly animation
+    if (firefliesRef.current && isNightMode) {
+      const positions = firefliesRef.current.geometry.attributes.position.array as Float32Array;
+      const scales = firefliesRef.current.geometry.attributes.scale.array as Float32Array;
+      
+      for (let i = 0; i < positions.length; i += 3) {
+        // Gentle bobbing movement
+        positions[i] += Math.sin(clock.elapsedTime * 0.5 + i) * 0.01;
+        positions[i + 1] += Math.cos(clock.elapsedTime * 0.3 + i) * 0.01;
+        positions[i + 2] += Math.sin(clock.elapsedTime * 0.4 + i) * 0.01;
+        
+        // Flicker effect
+        const idx = i / 3;
+        scales[idx] = (Math.sin(clock.elapsedTime * 3 + idx * 100) * 0.5 + 0.5) * 0.5 + 0.5;
+      }
+      
+      firefliesRef.current.geometry.attributes.position.needsUpdate = true;
+      firefliesRef.current.geometry.attributes.scale.needsUpdate = true;
     }
   });
   
@@ -355,39 +426,47 @@ const Environment = ({ isRaining, zoneId, ambientLightColor, groundColor }: Envi
     return elements;
   };
   
-  // Calculate sky parameters based on zone
+  // Calculate sky parameters based on zone and day/night mode
   const getSkyParams = () => {
+    // Base parameters adjusted for night mode
+    const baseParams = {
+      turbidity: isNightMode ? 0.1 : (isRaining ? 10 : 2),
+      rayleigh: isNightMode ? 0.2 : (isRaining ? 5 : 1),
+      sunPosition: [0, isNightMode ? -0.5 : (isRaining ? 0.05 : 0.5), 0] as [number, number, number]
+    };
+    
+    // Zone-specific adjustments
     switch(zoneId) {
       case "ayurvedic":
         return {
-          turbidity: isRaining ? 10 : 1,
-          rayleigh: isRaining ? 5 : 0.5,
-          sunPosition: [0, isRaining ? 0.05 : 0.6, 0] as [number, number, number]
+          ...baseParams,
+          turbidity: isNightMode ? 0.1 : (isRaining ? 10 : 1),
+          rayleigh: isNightMode ? 0.2 : (isRaining ? 5 : 0.5),
+          sunPosition: [0, isNightMode ? -0.5 : (isRaining ? 0.05 : 0.6), 0] as [number, number, number]
         };
       case "respiratory":
         return {
-          turbidity: 8,
-          rayleigh: 4,
-          sunPosition: [0, 0.3, 0] as [number, number, number]
+          ...baseParams,
+          turbidity: isNightMode ? 0.1 : 8,
+          rayleigh: isNightMode ? 0.2 : 4,
+          sunPosition: [0, isNightMode ? -0.5 : 0.3, 0] as [number, number, number]
         };
       case "immunity":
         return {
-          turbidity: isRaining ? 10 : 0.8,
-          rayleigh: isRaining ? 5 : 0.3,
-          sunPosition: [0, isRaining ? 0.05 : 0.8, 0] as [number, number, number]
+          ...baseParams,
+          turbidity: isNightMode ? 0.1 : (isRaining ? 10 : 0.8),
+          rayleigh: isNightMode ? 0.2 : (isRaining ? 5 : 0.3),
+          sunPosition: [0, isNightMode ? -0.5 : (isRaining ? 0.05 : 0.8), 0] as [number, number, number]
         };
       case "floral":
         return {
-          turbidity: isRaining ? 10 : 0.5,
-          rayleigh: isRaining ? 5 : 0.2,
-          sunPosition: [0, isRaining ? 0.05 : 0.7, 0] as [number, number, number]
+          ...baseParams,
+          turbidity: isNightMode ? 0.1 : (isRaining ? 10 : 0.5),
+          rayleigh: isNightMode ? 0.2 : (isRaining ? 5 : 0.2),
+          sunPosition: [0, isNightMode ? -0.5 : (isRaining ? 0.05 : 0.7), 0] as [number, number, number]
         };
       default:
-        return {
-          turbidity: isRaining ? 10 : 2,
-          rayleigh: isRaining ? 5 : 1,
-          sunPosition: [0, isRaining ? 0.05 : 0.5, 0] as [number, number, number]
-        };
+        return baseParams;
     }
   };
   
@@ -395,21 +474,31 @@ const Environment = ({ isRaining, zoneId, ambientLightColor, groundColor }: Envi
   
   return (
     <>
-      {/* Sky changes based on weather and zone */}
+      {/* Sky changes based on weather, time of day, and zone */}
       <Sky
         distance={450000}
         sunPosition={skyParams.sunPosition}
-        inclination={0.5}
-        azimuth={0.25}
+        inclination={isNightMode ? 0 : 0.5}
+        azimuth={isNightMode ? 0.75 : 0.25}
         turbidity={skyParams.turbidity}
         rayleigh={skyParams.rayleigh}
+        mieCoefficient={isNightMode ? 0.005 : 0.005}
+        mieDirectionalG={isNightMode ? 0.8 : 0.8}
       />
       
-      {/* Stars visible during rainy weather (darker sky) */}
-      {isRaining && <Stars radius={100} depth={50} count={1000} factor={4} fade />}
+      {/* Stars visible during night mode */}
+      {isNightMode && <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />}
       
-      {/* Clouds */}
-      {!isRaining && (
+      {/* Moon visible at night */}
+      {isNightMode && (
+        <mesh position={[20, 30, -40]} scale={8}>
+          <sphereGeometry args={[1, 32, 32]} />
+          <meshBasicMaterial color="#FFFFFF" />
+        </mesh>
+      )}
+      
+      {/* Clouds - fewer at night */}
+      {!isRaining && !isNightMode && (
         <>
           {/* Using any type casting to bypass the type checking for Cloud args */}
           <Cloud position={[-10, 15, 0]} args={[3, 2] as any} />
@@ -418,28 +507,56 @@ const Environment = ({ isRaining, zoneId, ambientLightColor, groundColor }: Envi
         </>
       )}
       
+      {!isRaining && isNightMode && (
+        <>
+          {/* Fewer, darker clouds at night */}
+          <Cloud position={[-20, 20, -10]} args={[5, 2] as any} color="#333333" />
+          <Cloud position={[15, 25, 5]} args={[6, 2] as any} color="#333333" />
+        </>
+      )}
+      
       {/* Environment lighting */}
       <DreiEnvironment
-        preset={isRaining ? "sunset" : "park"}
+        preset={isNightMode ? "night" : (isRaining ? "sunset" : "park")}
         background={false}
       />
       
-      {/* Ambient light - customized per zone */}
-      <ambientLight intensity={isRaining ? 0.5 : 0.8} color={ambientLightColor} />
+      {/* Ambient light - adjusted for day/night */}
+      <ambientLight 
+        intensity={isNightMode ? 0.2 : (isRaining ? 0.5 : 0.8)} 
+        color={isNightMode ? "#102030" : ambientLightColor} 
+      />
       
-      {/* Directional light (sun) */}
+      {/* Directional light (sun/moon) */}
       <directionalLight 
-        position={[10, 20, 10]} 
-        intensity={isRaining ? 0.3 : 1.5}
+        position={isNightMode ? [0, 10, -10] : [10, 20, 10]} 
+        intensity={isNightMode ? 0.1 : (isRaining ? 0.3 : 1.5)}
+        color={isNightMode ? "#77AABBFF" : "#FFFFFF"}
         castShadow
         shadow-mapSize={[2048, 2048]} 
       />
       
-      {/* Ground - customized per zone */}
+      {/* Additional moon light at night */}
+      {isNightMode && (
+        <spotLight 
+          position={[20, 30, -40]} 
+          intensity={0.5} 
+          color="#AACCFF" 
+          distance={100} 
+          angle={0.5} 
+          penumbra={1}
+        />
+      )}
+      
+      {/* Ground - adjusted color for day/night */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
         <planeGeometry args={[100, 100]} />
         <meshStandardMaterial 
-          color={isRaining ? (groundColor !== "#3a7e23" ? groundColor : "#2c5e1a") : groundColor} 
+          color={
+            isNightMode 
+              ? new THREE.Color(groundColor).multiplyScalar(0.3).getStyle()  // Much darker at night
+              : (isRaining ? (groundColor !== "#3a7e23" ? groundColor : "#2c5e1a") : groundColor)
+          } 
           roughness={0.8} 
         />
       </mesh>

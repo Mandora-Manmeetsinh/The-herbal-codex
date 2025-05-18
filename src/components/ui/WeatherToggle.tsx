@@ -1,3 +1,5 @@
+// This component is no longer used as the functionality has been moved directly to GardenExplorer
+// Keeping the file for backward compatibility until references are fully removed
 
 import { CloudSun, CloudMoon } from 'lucide-react';
 
