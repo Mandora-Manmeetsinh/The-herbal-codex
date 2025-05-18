@@ -362,31 +362,31 @@ const Environment = ({ isRaining, zoneId, ambientLightColor, groundColor }: Envi
         return {
           turbidity: isRaining ? 10 : 1,
           rayleigh: isRaining ? 5 : 0.5,
-          sunPosition: [0, isRaining ? 0.05 : 0.6, 0]
+          sunPosition: [0, isRaining ? 0.05 : 0.6, 0] as [number, number, number]
         };
       case "respiratory":
         return {
           turbidity: 8,
           rayleigh: 4,
-          sunPosition: [0, 0.3, 0]
+          sunPosition: [0, 0.3, 0] as [number, number, number]
         };
       case "immunity":
         return {
           turbidity: isRaining ? 10 : 0.8,
           rayleigh: isRaining ? 5 : 0.3,
-          sunPosition: [0, isRaining ? 0.05 : 0.8, 0]
+          sunPosition: [0, isRaining ? 0.05 : 0.8, 0] as [number, number, number]
         };
       case "floral":
         return {
           turbidity: isRaining ? 10 : 0.5,
           rayleigh: isRaining ? 5 : 0.2,
-          sunPosition: [0, isRaining ? 0.05 : 0.7, 0]
+          sunPosition: [0, isRaining ? 0.05 : 0.7, 0] as [number, number, number]
         };
       default:
         return {
           turbidity: isRaining ? 10 : 2,
           rayleigh: isRaining ? 5 : 1,
-          sunPosition: [0, isRaining ? 0.05 : 0.5, 0]
+          sunPosition: [0, isRaining ? 0.05 : 0.5, 0] as [number, number, number]
         };
     }
   };
