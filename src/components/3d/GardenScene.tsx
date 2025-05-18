@@ -1,19 +1,22 @@
-import { useState, useRef, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { useState, useRef, useEffect, Suspense } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Sky } from '@react-three/drei';
 import Plant3D from './Plant3D';
 import Environment from './Environment';
 import LoadingScreen from '../ui/LoadingScreen';
+import { getZoneById, zones } from '@/data/zones';
 
 interface GardenSceneProps {
   onPlantSelect: (plantData: any) => void;
   isRaining: boolean;
+  currentZoneId: string;
+  isZoneChanging: boolean;
 }
 
-// Expanded plant data with more variety and garden-like arrangement
+// Expanded plant data with zone affiliations
 const plants = [
   {
-    id: 1,
+    id: "1",
     name: "Lavender",
     scientificName: "Lavandula angustifolia",
     model: "/models/lavender.glb",
@@ -183,52 +186,102 @@ const plants = [
   }
 ];
 
-// Create garden paths and clusters
-const gardenPaths = [
-  // Main path
-  { position: [0, -0.49, 0], rotation: [0, 0, 0], scale: [2, 0.1, 8] },
-  // Crossing path
-  { position: [0, -0.49, 0], rotation: [0, Math.PI/2, 0], scale: [2, 0.1, 12] },
-  // Small corner path
-  { position: [4, -0.49, 4], rotation: [0, Math.PI/4, 0], scale: [1, 0.1, 3] }
-];
+// Create garden paths for each zone
+const createZonePaths = (zoneId: string) => {
+  switch(zoneId) {
+    case "ayurvedic":
+      return [
+        { position: [-15, -0.49, 0], rotation: [0, 0, 0], scale: [2, 0.1, 8] },
+        { position: [-15, -0.49, 0], rotation: [0, Math.PI/2, 0], scale: [2, 0.1, 6] },
+        { position: [-12, -0.49, 2], rotation: [0, Math.PI/4, 0], scale: [1, 0.1, 3] }
+      ];
+    case "respiratory":
+      return [
+        { position: [0, -0.49, -15], rotation: [0, 0, 0], scale: [8, 0.1, 2] },
+        { position: [0, -0.49, -15], rotation: [0, Math.PI/2, 0], scale: [2, 0.1, 8] },
+        { position: [2, -0.49, -12], rotation: [0, Math.PI/4, 0], scale: [1, 0.1, 3] }
+      ];
+    case "immunity":
+      return [
+        { position: [15, -0.49, 0], rotation: [0, 0, 0], scale: [2, 0.1, 8] },
+        { position: [15, -0.49, 0], rotation: [0, Math.PI/2, 0], scale: [2, 0.1, 6] },
+        { position: [12, -0.49, 2], rotation: [0, -Math.PI/4, 0], scale: [1, 0.1, 3] }
+      ];
+    case "floral":
+      return [
+        { position: [0, -0.49, 15], rotation: [0, 0, 0], scale: [8, 0.1, 2] },
+        { position: [0, -0.49, 15], rotation: [0, Math.PI/2, 0], scale: [2, 0.1, 8] },
+        { position: [2, -0.49, 12], rotation: [0, -Math.PI/4, 0], scale: [1, 0.1, 3] }
+      ];
+    default:
+      return [
+        { position: [0, -0.49, 0], rotation: [0, 0, 0], scale: [2, 0.1, 8] },
+        { position: [0, -0.49, 0], rotation: [0, Math.PI/2, 0], scale: [2, 0.1, 12] },
+      ];
+  }
+};
 
-const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
-  const controlsRef = useRef(null);
-  const [activePlant, setActivePlant] = useState<number | null>(null);
+// Camera Controller component to handle zone transitions
+const CameraController = ({ targetZoneId, isChanging }: { targetZoneId: string, isChanging: boolean }) => {
+  const { camera } = useThree();
+  const controlsRef = useRef<any>(null);
+  
+  useEffect(() => {
+    if (isChanging) {
+      const zone = getZoneById(targetZoneId);
+      if (zone && controlsRef.current) {
+        // Set new camera position and target
+        camera.position.set(...zone.position);
+        controlsRef.current.target.set(0, 0, 0);
+      }
+    }
+  }, [targetZoneId, isChanging, camera]);
+  
+  return (
+    <OrbitControls 
+      ref={controlsRef}
+      enablePan={true}
+      enableZoom={true}
+      enableRotate={true}
+      minDistance={2}
+      maxDistance={20}
+      maxPolarAngle={Math.PI / 2 - 0.1} // Prevent going below ground
+    />
+  );
+};
+
+const GardenScene = ({ onPlantSelect, isRaining, currentZoneId, isZoneChanging }: GardenSceneProps) => {
+  const [activePlant, setActivePlant] = useState<string | null>(null);
+  
+  // Get current zone data
+  const currentZone = getZoneById(currentZoneId) || zones[0];
+  const gardenPaths = createZonePaths(currentZoneId);
+  
+  // Filter plants for the current zone
+  const zonePlants = plants.filter(plant => 
+    currentZone.plants.includes(plant.id.toString())
+  );
   
   const handlePlantClick = (plant: any) => {
     onPlantSelect(plant);
     setActivePlant(plant.id);
-    
-    // Move camera slightly toward the selected plant
-    if (controlsRef.current) {
-      controlsRef.current.target.set(
-        plant.position[0], 
-        plant.position[1] + 1, 
-        plant.position[2]
-      );
-    }
   };
   
   return (
     <div className="canvas-container">
       <Canvas shadows>
         <Suspense fallback={<LoadingScreen />}>
-          <PerspectiveCamera makeDefault position={[5, 3, 8]} fov={50} />
-          <OrbitControls 
-            ref={controlsRef}
-            enablePan={true}
-            enableZoom={true}
-            enableRotate={true}
-            minDistance={2}
-            maxDistance={20}
-            maxPolarAngle={Math.PI / 2 - 0.1} // Prevent going below ground
+          <PerspectiveCamera makeDefault position={currentZone.position} fov={50} />
+          <CameraController targetZoneId={currentZoneId} isChanging={isZoneChanging} />
+          
+          <Environment 
+            isRaining={isRaining} 
+            zoneId={currentZoneId} 
+            ambientLightColor={currentZone.ambientLight}
+            groundColor={currentZone.groundColor}
           />
           
-          <Environment isRaining={isRaining} />
-          
-          {/* Garden paths */}
+          {/* Garden paths specific to current zone */}
           {gardenPaths.map((path, idx) => (
             <mesh 
               key={`path-${idx}`} 
@@ -241,25 +294,48 @@ const GardenScene = ({ onPlantSelect, isRaining }: GardenSceneProps) => {
             </mesh>
           ))}
           
-          {/* Garden border/edging */}
-          <mesh position={[0, -0.45, 0]} receiveShadow>
-            <torusGeometry args={[9, 0.3, 8, 36]} />
-            <meshStandardMaterial color="#8B4513" roughness={0.8} />
+          {/* Zone entrance marker */}
+          <mesh position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+            <circleGeometry args={[1.5, 32]} />
+            <meshStandardMaterial color="#d4c9a8" roughness={0.8} />
           </mesh>
           
-          {/* Plants */}
-          {plants.map((plant) => (
-            <Plant3D
-              key={plant.id}
-              position={plant.position}
-              rotation={plant.rotation}
-              scale={plant.scale}
-              model={plant.model}
-              onClick={() => handlePlantClick(plant)}
-              isRaining={isRaining}
-              color={plant.color}
+          {/* Zone-specific plants */}
+          {zonePlants.map((plant) => {
+            // Adjust plant positions based on current zone
+            const adjustedPosition: [number, number, number] = [
+              plant.position[0] + (currentZone.position[0] * 0.5),
+              plant.position[1],
+              plant.position[2] + (currentZone.position[2] * 0.5)
+            ];
+            
+            return (
+              <Plant3D
+                key={plant.id}
+                position={adjustedPosition}
+                rotation={plant.rotation}
+                scale={plant.scale}
+                model={plant.model}
+                onClick={() => handlePlantClick(plant)}
+                isRaining={isRaining}
+                color={plant.color}
+              />
+            );
+          })}
+          
+          {/* Zone name indicator on the ground */}
+          <mesh 
+            position={[currentZone.position[0] * 0.3, 0.01, currentZone.position[2] * 0.3]} 
+            rotation={[-Math.PI / 2, 0, 0]} 
+            receiveShadow
+          >
+            <planeGeometry args={[4, 1]} />
+            <meshStandardMaterial 
+              color="#8B4513" 
+              transparent 
+              opacity={0.7} 
             />
-          ))}
+          </mesh>
         </Suspense>
       </Canvas>
     </div>
