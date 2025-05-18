@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import SearchFilters from '../components/library/SearchFilters';
 import PlantCard from '../components/library/PlantCard';

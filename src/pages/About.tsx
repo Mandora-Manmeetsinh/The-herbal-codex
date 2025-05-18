@@ -1,7 +1,6 @@
-
 import { useEffect, useRef, useState } from 'react';
 import Layout from '../components/layout/Layout';
-import { Book, Globe, Flask, Users } from 'lucide-react';
+import { Book, Globe, FlaskConical, Users } from 'lucide-react';
 
 const About = () => {
   const [visibleSections, setVisibleSections] = useState<string[]>([]);
@@ -56,7 +55,7 @@ const About = () => {
       description: "We promote sustainable harvesting practices and conservation of medicinal plant species."
     },
     {
-      icon: Flask,
+      icon: FlaskConical,
       title: "Innovation",
       description: "We use cutting-edge technology to make learning about plants more interactive and engaging."
     },

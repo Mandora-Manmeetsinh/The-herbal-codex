@@ -1,6 +1,6 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { Search, CloudSun, Share, Book, Leaf, Flask } from 'lucide-react';
+import { Search, CloudSun, Share, Book, Leaf, FlaskConical } from 'lucide-react';
 
 const FeaturesSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -59,7 +59,7 @@ const FeaturesSection = () => {
       color: "bg-lime-400"
     },
     {
-      icon: Flask,
+      icon: FlaskConical,
       title: "Preparation Methods",
       description: "Discover different ways to prepare herbs for maximum benefits, from teas and tinctures to poultices.",
       color: "bg-violet-400"
