@@ -6,6 +6,7 @@ import PlantInfoPanel from '../components/ui/PlantInfoPanel';
 import WeatherToggle from '../components/ui/WeatherToggle';
 import ZoneSelector from '../components/ui/ZoneSelector';
 import SymptomFinder from '../components/ui/SymptomFinder';
+import MiniMap from '../components/ui/MiniMap';
 import { Sun, Moon, Cloud, CloudRain } from 'lucide-react';
 import { zones } from '@/data/zones';
 
@@ -63,6 +64,12 @@ const GardenExplorer = () => {
         />
         
         <ZoneSelector 
+          currentZone={currentZone}
+          onZoneSelect={handleZoneChange}
+        />
+        
+        {/* Add MiniMap component */}
+        <MiniMap
           currentZone={currentZone}
           onZoneSelect={handleZoneChange}
         />
@@ -130,6 +137,7 @@ const GardenExplorer = () => {
               <li>☁️ <span className="font-medium">Weather toggle</span>: Change weather conditions</li>
               <li>🌙 <span className="font-medium">Day/Night toggle</span>: Change time of day</li>
               <li>🔎 <span className="font-medium">Symptom finder</span>: Find herbs for specific ailments</li>
+              <li>🗺️ <span className="font-medium">Mini-map</span>: See garden layout and navigate</li>
             </ul>
             <button 
               className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-full transition-colors"
