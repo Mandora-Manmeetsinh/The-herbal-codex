@@ -132,6 +132,27 @@ export default {
 					"100%": {
 						transform: "rotate(360deg)"
 					}
+				},
+				"shimmer": {
+					"0%": {
+						backgroundPosition: "-200% 0"
+					},
+					"100%": {
+						backgroundPosition: "200% 0"
+					}
+				},
+				"leaf-fall": {
+					"0%": {
+						transform: "translateY(-10%) rotate(0deg)",
+						opacity: "0"
+					},
+					"10%": {
+						opacity: "1"
+					},
+					"100%": {
+						transform: "translateY(100vh) rotate(360deg)",
+						opacity: "0"
+					}
 				}
 			},
 			animation: {
@@ -141,7 +162,9 @@ export default {
 				"float": "float 6s ease-in-out infinite",
 				"sway": "sway 8s ease-in-out infinite",
 				"pulse-glow": "pulse-glow 3s ease-in-out infinite",
-				"rotate-slow": "rotate-slow 12s linear infinite"
+				"rotate-slow": "rotate-slow 12s linear infinite",
+				"shimmer": "shimmer 3s infinite",
+				"leaf-fall": "leaf-fall 10s linear forwards"
 			},
 			backgroundImage: {
 				'hero-pattern': "url('/herbs-bg.jpg')",

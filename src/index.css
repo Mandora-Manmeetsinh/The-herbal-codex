@@ -113,6 +113,14 @@
   .herb-section {
     @apply py-12 md:py-20;
   }
+
+  .feature-pill {
+    @apply bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-center border border-white/30 hover:bg-white/30 transition-all duration-300 cursor-default;
+  }
+
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-lg;
+  }
 }
 
 /* Enhanced animations */
@@ -136,6 +144,11 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
@@ -150,6 +163,13 @@
 
 .animate-fade-in {
   animation: fade-in 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.3), rgba(255,255,255,0));
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
 }
 
 .animation-delay-100 { animation-delay: 0.1s; }
@@ -234,4 +254,26 @@
 /* Perspective for 3D card effects */
 .perspective {
   perspective: 1000px;
+}
+
+/* Custom styles for the home page */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.bg-radial-gradient {
+  transition: background 0.3s ease;
 }
