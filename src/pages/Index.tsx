@@ -3,6 +3,7 @@ import Layout from '../components/layout/Layout';
 import HeroSection from '../components/home/HeroSection';
 import FeaturesSection from '../components/home/FeaturesSection';
 import FeaturedPlantsSection from '../components/home/FeaturedPlantsSection';
+import PlantGallery from '../components/home/PlantGallery';
 import CtaSection from '../components/home/CtaSection';
 import TestimonialsSection from '../components/home/TestimonialsSection';
 
@@ -11,6 +12,7 @@ const Index = () => {
     <Layout fullHeight={true}>
       <HeroSection />
       <FeaturesSection />
+      <PlantGallery />
       <TestimonialsSection />
       <FeaturedPlantsSection />
       <CtaSection />
