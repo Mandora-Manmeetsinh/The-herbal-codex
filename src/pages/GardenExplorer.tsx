@@ -7,6 +7,7 @@ import WeatherToggle from '../components/ui/WeatherToggle';
 import ZoneSelector from '../components/ui/ZoneSelector';
 import SymptomFinder from '../components/ui/SymptomFinder';
 import MiniMap from '../components/ui/MiniMap';
+import GardenStats from '../components/ui/GardenStats';
 import { Sun, Moon, Cloud, CloudRain } from 'lucide-react';
 import { zones } from '@/data/zones';
 
@@ -18,6 +19,10 @@ const GardenExplorer = () => {
   const [currentZone, setCurrentZone] = useState("ayurvedic"); // Default zone
   const [isZoneChanging, setIsZoneChanging] = useState(false);
   const [showSymptomFinder, setShowSymptomFinder] = useState(false);
+  
+  // Get current zone object and plant count
+  const activeZone = zones.find(zone => zone.id === currentZone) || zones[0];
+  const zonePlantsCount = activeZone ? activeZone.plants.length : 0;
   
   const handlePlantSelect = (plant: any) => {
     setSelectedPlant(plant);
@@ -49,9 +54,6 @@ const GardenExplorer = () => {
     }
   };
   
-  // Find the current zone object
-  const activeZone = zones.find(zone => zone.id === currentZone) || zones[0];
-  
   return (
     <Layout fullHeight={true}>
       <div className="relative w-full h-screen">
@@ -68,7 +70,13 @@ const GardenExplorer = () => {
           onZoneSelect={handleZoneChange}
         />
         
-        {/* Add MiniMap component */}
+        {/* Garden Stats Panel */}
+        <GardenStats 
+          currentZone={currentZone} 
+          plantCount={zonePlantsCount}
+        />
+        
+        {/* MiniMap */}
         <MiniMap
           currentZone={currentZone}
           onZoneSelect={handleZoneChange}
