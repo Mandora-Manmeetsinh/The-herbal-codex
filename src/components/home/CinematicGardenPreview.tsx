@@ -164,16 +164,16 @@ const StonePath = () => {
 };
 
 // Herbal Plants
-const HerbalPlants = ({ onHover }) => {
+const HerbalPlants = ({ onHover }: { onHover: (herbName: string, isHovered: boolean) => void }) => {
   const herbsData = [
-    { name: "Tulsi", position: [-2, 0.1, -3], color: "#3A7D44" },
-    { name: "Brahmi", position: [2, 0.1, -5], color: "#5E9C60" },
-    { name: "Gotu Kola", position: [-3, 0.1, -8], color: "#8FBC8F" },
-    { name: "Ashwagandha", position: [3, 0.1, -10], color: "#567D46" },
-    { name: "Turmeric", position: [-2.5, 0.1, 2], color: "#D4AC2B" },
-    { name: "Ginseng", position: [2.5, 0.1, 4], color: "#B97D60" },
-    { name: "Mint", position: [-2, 0.1, 7], color: "#52B788" },
-    { name: "Lavender", position: [2, 0.1, 10], color: "#A388E5" }
+    { name: "Tulsi", position: [-2, 0.1, -3] as [number, number, number], color: "#3A7D44" },
+    { name: "Brahmi", position: [2, 0.1, -5] as [number, number, number], color: "#5E9C60" },
+    { name: "Gotu Kola", position: [-3, 0.1, -8] as [number, number, number], color: "#8FBC8F" },
+    { name: "Ashwagandha", position: [3, 0.1, -10] as [number, number, number], color: "#567D46" },
+    { name: "Turmeric", position: [-2.5, 0.1, 2] as [number, number, number], color: "#D4AC2B" },
+    { name: "Ginseng", position: [2.5, 0.1, 4] as [number, number, number], color: "#B97D60" },
+    { name: "Mint", position: [-2, 0.1, 7] as [number, number, number], color: "#52B788" },
+    { name: "Lavender", position: [2, 0.1, 10] as [number, number, number], color: "#A388E5" }
   ];
   
   return (
@@ -253,12 +253,12 @@ const Lanterns = () => {
 };
 
 // Zone Markers
-const ZoneMarkers = ({ onNavigate }) => {
+const ZoneMarkers = ({ onNavigate }: { onNavigate: (path: string) => void }) => {
   const zones = [
-    { name: "Immunity Herbs", position: [-10, 0, -10], path: "immunity" },
-    { name: "Aromatic Garden", position: [10, 0, -10], path: "floral" },
-    { name: "Relaxation Zone", position: [10, 0, 10], path: "respiratory" },
-    { name: "Ancient Remedies", position: [-10, 0, 10], path: "ayurvedic" },
+    { name: "Immunity Herbs", position: [-10, 0, -10] as [number, number, number], path: "immunity" },
+    { name: "Aromatic Garden", position: [10, 0, -10] as [number, number, number], path: "floral" },
+    { name: "Relaxation Zone", position: [10, 0, 10] as [number, number, number], path: "respiratory" },
+    { name: "Ancient Remedies", position: [-10, 0, 10] as [number, number, number], path: "ayurvedic" },
   ];
   
   return (
@@ -311,8 +311,33 @@ const ZoneMarkers = ({ onNavigate }) => {
   );
 };
 
+interface Props {
+  children: React.ReactNode;
+  position: [number, number, number];
+}
+
+// Fix missing Html import
+const Html = ({ position, children }: Props) => {
+  return (
+    <mesh position={position}>
+      <planeGeometry args={[0.1, 0.1]} />
+      <meshBasicMaterial transparent opacity={0} />
+      <div
+        style={{
+          position: 'absolute',
+          transform: `translate3d(${position[0]}px, ${-position[1]}px, ${position[2]}px)`,
+          transformOrigin: 'center',
+          pointerEvents: 'none',
+        }}
+      >
+        {children}
+      </div>
+    </mesh>
+  );
+};
+
 // Main scene component
-const CinematicGardenScene = ({ onNavigate }) => {
+const CinematicGardenScene = ({ onNavigate }: { onNavigate: (path: string) => void }) => {
   const [hoveredHerb, setHoveredHerb] = useState<string | null>(null);
   
   const handleHerbHover = (herbName: string, isHovered: boolean) => {
@@ -326,7 +351,6 @@ const CinematicGardenScene = ({ onNavigate }) => {
         makeDefault 
         position={[0, 5, 18]} 
         fov={50}
-        lookAt={[0, 1, 0]}
       />
       
       {/* Ambient lighting */}
@@ -357,10 +381,10 @@ const CinematicGardenScene = ({ onNavigate }) => {
       {/* Environment ambient lighting */}
       <Environment preset="forest" />
       
-      {/* Misty clouds */}
-      <Cloud position={[0, 10, -15]} opacity={0.5} speed={0.4} width={20} depth={5} />
-      <Cloud position={[-10, 6, -20]} opacity={0.3} speed={0.2} width={10} depth={2} />
-      <Cloud position={[15, 8, -15]} opacity={0.4} speed={0.3} width={15} depth={3} />
+      {/* Misty clouds - fixed Cloud props */}
+      <Cloud position={[0, 10, -15]} opacity={0.5} speed={0.4} segments={20} />
+      <Cloud position={[-10, 6, -20]} opacity={0.3} speed={0.2} segments={10} />
+      <Cloud position={[15, 8, -15]} opacity={0.4} speed={0.3} segments={15} />
       
       {/* Scene fog */}
       <fog attach="fog" color="#B8C5D6" near={1} far={50} />
@@ -397,26 +421,6 @@ const CinematicGardenScene = ({ onNavigate }) => {
         </Html>
       )}
     </>
-  );
-};
-
-// Fix missing Html import
-const Html = ({ position, children }) => {
-  return (
-    <mesh position={position}>
-      <planeGeometry args={[0.1, 0.1]} />
-      <meshBasicMaterial transparent opacity={0} />
-      <div
-        style={{
-          position: 'absolute',
-          transform: `translate3d(${position[0]}px, ${-position[1]}px, ${position[2]}px)`,
-          transformOrigin: 'center',
-          pointerEvents: 'none',
-        }}
-      >
-        {children}
-      </div>
-    </mesh>
   );
 };
 
