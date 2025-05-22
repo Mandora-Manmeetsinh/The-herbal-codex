@@ -9,7 +9,7 @@ import ZoneSelector from '../components/ui/ZoneSelector';
 import SymptomFinder from '../components/ui/SymptomFinder';
 import MiniMap from '../components/ui/MiniMap';
 import GardenStats from '../components/ui/GardenStats';
-import { Sun, Moon, Cloud, CloudRain } from 'lucide-react';
+import { Sun, Moon, Cloud, CloudRain, Gamepad2, User } from 'lucide-react';
 import { zones } from '@/data/zones';
 
 const GardenExplorer = () => {
@@ -24,6 +24,8 @@ const GardenExplorer = () => {
   const [currentZone, setCurrentZone] = useState(zoneParam || "ayurvedic"); // Use zone from URL or default
   const [isZoneChanging, setIsZoneChanging] = useState(false);
   const [showSymptomFinder, setShowSymptomFinder] = useState(false);
+  const [isFirstPerson, setIsFirstPerson] = useState(false);
+  const [characterPosition, setCharacterPosition] = useState<[number, number, number]>([0, 0.5, 0]);
   
   // Get current zone object and plant count
   const activeZone = zones.find(zone => zone.id === currentZone) || zones[0];
@@ -58,6 +60,16 @@ const GardenExplorer = () => {
       setSelectedPlant(null);
     }
   };
+  
+  const toggleViewMode = () => {
+    setIsFirstPerson(!isFirstPerson);
+    // Reset character position when toggling between views
+    setCharacterPosition([0, 0.5, 0]);
+  };
+  
+  const handleCharacterMove = (position: [number, number, number]) => {
+    setCharacterPosition(position);
+  };
 
   // Effect to check for zone parameter in URL
   useEffect(() => {
@@ -78,26 +90,47 @@ const GardenExplorer = () => {
           isNightMode={isNightMode}
           currentZoneId={currentZone}
           isZoneChanging={isZoneChanging}
+          isFirstPerson={isFirstPerson}
+          characterPosition={characterPosition}
+          onCharacterMove={handleCharacterMove}
         />
         
-        <ZoneSelector 
-          currentZone={currentZone}
-          onZoneSelect={handleZoneChange}
-        />
+        {!isFirstPerson && (
+          <ZoneSelector 
+            currentZone={currentZone}
+            onZoneSelect={handleZoneChange}
+          />
+        )}
         
-        {/* Garden Stats Panel */}
-        <GardenStats 
-          currentZone={currentZone} 
-          plantCount={zonePlantsCount}
-        />
+        {/* Garden Stats Panel - Hide in first person mode */}
+        {!isFirstPerson && (
+          <GardenStats 
+            currentZone={currentZone} 
+            plantCount={zonePlantsCount}
+          />
+        )}
         
-        {/* MiniMap */}
+        {/* MiniMap - Show in all views but make it smaller in first person */}
         <MiniMap
           currentZone={currentZone}
           onZoneSelect={handleZoneChange}
+          isCompact={isFirstPerson}
         />
         
         <div className="absolute top-4 right-4 flex flex-col space-y-2">
+          {/* View mode toggle */}
+          <button 
+            onClick={toggleViewMode}
+            className="p-3 rounded-full bg-white shadow-lg hover:bg-herb-cream transition-colors"
+            aria-label={isFirstPerson ? "Switch to orbit camera" : "Switch to first person view"}
+          >
+            {isFirstPerson ? (
+              <Gamepad2 className="text-herb-green" size={24} />
+            ) : (
+              <User className="text-herb-green-dark" size={24} />
+            )}
+          </button>
+          
           {/* Weather toggle */}
           <button 
             onClick={handleWeatherToggle}
@@ -125,17 +158,19 @@ const GardenExplorer = () => {
           </button>
         </div>
 
-        {/* Symptom Finder Toggle Button */}
-        <button
-          onClick={toggleSymptomFinder}
-          className={`absolute bottom-4 right-4 p-3 rounded-full shadow-lg transition-colors ${showSymptomFinder ? 'bg-herb-green text-white' : 'bg-white text-herb-green-dark'}`}
-          aria-label="Find herbs by symptom"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.3-4.3"/>
-          </svg>
-        </button>
+        {/* Symptom Finder Toggle Button - Hide in first person mode */}
+        {!isFirstPerson && (
+          <button
+            onClick={toggleSymptomFinder}
+            className={`absolute bottom-4 right-4 p-3 rounded-full shadow-lg transition-colors ${showSymptomFinder ? 'bg-herb-green text-white' : 'bg-white text-herb-green-dark'}`}
+            aria-label="Find herbs by symptom"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+          </button>
+        )}
         
         {selectedPlant && (
           <PlantInfoPanel plant={selectedPlant} onClose={() => setSelectedPlant(null)} />
@@ -161,6 +196,7 @@ const GardenExplorer = () => {
               <li>🌙 <span className="font-medium">Day/Night toggle</span>: Change time of day</li>
               <li>🔎 <span className="font-medium">Symptom finder</span>: Find herbs for specific ailments</li>
               <li>🗺️ <span className="font-medium">Mini-map</span>: See garden layout and navigate</li>
+              <li>👤 <span className="font-medium">First-person view</span>: Explore like a game character (WASD/arrow keys)</li>
             </ul>
             <button 
               className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-full transition-colors"
@@ -168,6 +204,13 @@ const GardenExplorer = () => {
             >
               Start Exploring
             </button>
+          </div>
+        )}
+        
+        {/* First-person mode controls hint */}
+        {isFirstPerson && !showInstructions && (
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/30 px-4 py-2 rounded-full text-white text-center">
+            <p className="text-sm">Use <span className="font-bold">WASD</span> or <span className="font-bold">Arrow Keys</span> to move | <span className="font-bold">Mouse</span> to look around</p>
           </div>
         )}
         

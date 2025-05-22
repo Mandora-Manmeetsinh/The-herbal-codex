@@ -5,6 +5,7 @@ import Plant3D from './Plant3D';
 import Environment from './Environment';
 import LoadingScreen from '../ui/LoadingScreen';
 import { getZoneById, zones } from '@/data/zones';
+import GardenCharacter from './GardenCharacter';
 
 interface GardenSceneProps {
   onPlantSelect: (plantData: any) => void;
@@ -12,6 +13,9 @@ interface GardenSceneProps {
   isNightMode: boolean;
   currentZoneId: string;
   isZoneChanging: boolean;
+  isFirstPerson?: boolean;
+  characterPosition: [number, number, number];
+  onCharacterMove: (position: [number, number, number]) => void;
 }
 
 // Expanded plant data with zone affiliations
@@ -222,13 +226,37 @@ const createZonePaths = (zoneId: string) => {
   }
 };
 
+// First Person Camera Controller
+const FirstPersonCamera = ({ characterPosition }: { characterPosition: [number, number, number] }) => {
+  const { camera } = useThree();
+  
+  useEffect(() => {
+    // Position camera slightly above and behind character
+    camera.position.set(
+      characterPosition[0],
+      characterPosition[1] + 1.7, // Eye height
+      characterPosition[2]
+    );
+  }, [camera, characterPosition]);
+  
+  return null;
+};
+
 // Camera Controller component to handle zone transitions
-const CameraController = ({ targetZoneId, isChanging }: { targetZoneId: string, isChanging: boolean }) => {
+const CameraController = ({ 
+  targetZoneId, 
+  isChanging, 
+  isFirstPerson 
+}: { 
+  targetZoneId: string, 
+  isChanging: boolean,
+  isFirstPerson: boolean
+}) => {
   const { camera } = useThree();
   const controlsRef = useRef<any>(null);
   
   useEffect(() => {
-    if (isChanging) {
+    if (isChanging && !isFirstPerson) {
       const zone = getZoneById(targetZoneId);
       if (zone && controlsRef.current) {
         // Set new camera position and target
@@ -236,7 +264,10 @@ const CameraController = ({ targetZoneId, isChanging }: { targetZoneId: string, 
         controlsRef.current.target.set(0, 0, 0);
       }
     }
-  }, [targetZoneId, isChanging, camera]);
+  }, [targetZoneId, isChanging, camera, isFirstPerson]);
+  
+  // Only render controls if not in first-person mode
+  if (isFirstPerson) return null;
   
   return (
     <OrbitControls 
@@ -256,7 +287,10 @@ const GardenScene = ({
   isRaining, 
   isNightMode,
   currentZoneId, 
-  isZoneChanging 
+  isZoneChanging,
+  isFirstPerson = false,
+  characterPosition,
+  onCharacterMove
 }: GardenSceneProps) => {
   const [activePlant, setActivePlant] = useState<string | null>(null);
   
@@ -278,8 +312,17 @@ const GardenScene = ({
     <div className="canvas-container">
       <Canvas shadows>
         <Suspense fallback={<LoadingScreen />}>
-          <PerspectiveCamera makeDefault position={currentZone.position} fov={50} />
-          <CameraController targetZoneId={currentZoneId} isChanging={isZoneChanging} />
+          {!isFirstPerson ? (
+            <PerspectiveCamera makeDefault position={currentZone.position} fov={50} />
+          ) : (
+            <FirstPersonCamera characterPosition={characterPosition} />
+          )}
+          
+          <CameraController 
+            targetZoneId={currentZoneId} 
+            isChanging={isZoneChanging} 
+            isFirstPerson={isFirstPerson}
+          />
           
           <Environment 
             isRaining={isRaining}
@@ -331,6 +374,14 @@ const GardenScene = ({
               />
             );
           })}
+          
+          {/* Player character - only shown in first person mode */}
+          {isFirstPerson && (
+            <GardenCharacter
+              position={characterPosition}
+              onMove={onCharacterMove}
+            />
+          )}
           
           {/* Zone name indicator on the ground */}
           <mesh 
