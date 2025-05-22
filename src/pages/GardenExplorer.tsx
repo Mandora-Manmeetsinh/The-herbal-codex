@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import GardenScene from '../components/3d/GardenScene';
 import PlantInfoPanel from '../components/ui/PlantInfoPanel';
@@ -12,11 +13,15 @@ import { Sun, Moon, Cloud, CloudRain } from 'lucide-react';
 import { zones } from '@/data/zones';
 
 const GardenExplorer = () => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const zoneParam = queryParams.get('zone');
+
   const [selectedPlant, setSelectedPlant] = useState<any | null>(null);
   const [isRaining, setIsRaining] = useState(false);
   const [isNightMode, setIsNightMode] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
-  const [currentZone, setCurrentZone] = useState("ayurvedic"); // Default zone
+  const [currentZone, setCurrentZone] = useState(zoneParam || "ayurvedic"); // Use zone from URL or default
   const [isZoneChanging, setIsZoneChanging] = useState(false);
   const [showSymptomFinder, setShowSymptomFinder] = useState(false);
   
@@ -53,6 +58,16 @@ const GardenExplorer = () => {
       setSelectedPlant(null);
     }
   };
+
+  // Effect to check for zone parameter in URL
+  useEffect(() => {
+    if (zoneParam && zones.some(zone => zone.id === zoneParam)) {
+      setCurrentZone(zoneParam);
+      // Briefly set zone changing to true to trigger camera transition
+      setIsZoneChanging(true);
+      setTimeout(() => setIsZoneChanging(false), 1000);
+    }
+  }, [zoneParam]);
   
   return (
     <Layout fullHeight={true}>
