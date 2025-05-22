@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
@@ -9,8 +8,8 @@ import {
   Sky, 
   Stars,
   useTexture,
-  Text3D,
-  Cloud
+  Cloud,
+  Text
 } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -277,15 +276,16 @@ const ZoneMarkers = ({ onNavigate }: { onNavigate: (path: string) => void }) => 
             <meshStandardMaterial color="#8B4513" roughness={0.7} />
           </mesh>
           
-          {/* Zone label */}
+          {/* Zone label - replaced Text3D with Text */}
           <group position={[0, 2.5, 0]} rotation={[0, Math.PI / 4, 0]}>
-            <Text3D
-              font="/fonts/Inter_Regular.json"
-              size={0.5}
-              height={0.1}
-              curveSegments={12}
+            <Text
+              fontSize={0.5}
+              color="#D4AC2B"
+              anchorX="center"
+              anchorY="middle"
+              position={[0, 0, 0]}
               onClick={() => onNavigate(zone.path)}
-              position={[-2, 0, 0]}
+              userData={{ hoverable: true }}
             >
               {zone.name}
               <meshStandardMaterial 
@@ -295,7 +295,7 @@ const ZoneMarkers = ({ onNavigate }: { onNavigate: (path: string) => void }) => 
                 emissive="#D4AC2B"
                 emissiveIntensity={0.2}
               />
-            </Text3D>
+            </Text>
           </group>
           
           {/* Glowing element */}
