@@ -17,26 +17,20 @@ const MiniMap = ({ currentZone, onZoneSelect, isCompact = false }: MiniMapProps)
   };
   
   return (
-    <div className={`absolute ${isCompact ? 'right-4 top-24' : 'right-4 top-4'} z-10`}>
+    <div className={`absolute ${isCompact ? 'left-4 top-4' : 'left-4 bottom-4'} z-10`}>
       <div 
-        className={`bg-white bg-opacity-80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transition-all duration-300 ${
+        className={`bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transition-all duration-300 border-2 border-herb-green-light ${
           isExpanded ? 'w-64 h-64' : isCompact ? 'w-16 h-16' : 'w-32 h-32'
         }`}
       >
-        {/* Map Container */}
         <div 
           className="relative w-full h-full p-2 cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          {/* Map Background */}
           <div className="absolute inset-0 bg-herb-green-dark bg-opacity-30 rounded-lg">
-            {/* Central point */}
             <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-herb-green-dark rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
             
-            {/* Zone indicators */}
             {zones.map((zone) => {
-              // Calculate position based on zone's 3D coordinates
-              // Normalize to fit within the map dimensions
               const xPos = ((zone.position[0] / 20) * 0.5 + 0.5) * 100;
               const yPos = ((-zone.position[2] / 20) * 0.5 + 0.5) * 100;
               
@@ -62,7 +56,7 @@ const MiniMap = ({ currentZone, onZoneSelect, isCompact = false }: MiniMapProps)
                   title={zone.name}
                 >
                   {isExpanded && (
-                    <div className="absolute whitespace-nowrap top-full left-1/2 transform -translate-x-1/2 mt-1 text-xs font-medium">
+                    <div className="absolute whitespace-nowrap top-full left-1/2 transform -translate-x-1/2 mt-1 text-xs font-medium text-herb-green-dark">
                       {zone.name}
                     </div>
                   )}
@@ -70,7 +64,6 @@ const MiniMap = ({ currentZone, onZoneSelect, isCompact = false }: MiniMapProps)
               );
             })}
             
-            {/* Path lines */}
             <svg className="absolute inset-0 w-full h-full" style={{pointerEvents: 'none'}}>
               <path 
                 d="M50,50 L25,25 M50,50 L75,25 M50,50 L75,75 M50,50 L25,75" 
@@ -83,7 +76,6 @@ const MiniMap = ({ currentZone, onZoneSelect, isCompact = false }: MiniMapProps)
           </div>
         </div>
         
-        {/* Zone Label */}
         {!isExpanded && !isCompact && (
           <div className="absolute bottom-0 inset-x-0 bg-herb-green-dark bg-opacity-70 text-white text-xs py-1 px-2 text-center truncate">
             {zones.find(z => z.id === currentZone)?.name}

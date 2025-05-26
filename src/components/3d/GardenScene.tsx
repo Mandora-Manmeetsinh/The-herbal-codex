@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Sky, Stars } from '@react-three/drei';
-// Removed direct import of OrbitControlsImpl from 'three/examples/jsm/controls/OrbitControls'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import Plant3D from './Plant3D';
 import Environment from './Environment';
@@ -10,7 +9,7 @@ import { getZoneById, zones } from '@/data/zones';
 import GardenCharacter from './GardenCharacter';
 
 interface GardenSceneProps {
-  onPlantSelect: (plantData: THREE.Scene) => void;
+  onPlantSelect: (plantData: any) => void;
   isRaining: boolean;
   isNightMode: boolean;
   currentZoneId: string;
@@ -233,10 +232,9 @@ const FirstPersonCamera = ({ characterPosition }: { characterPosition: [number, 
   const { camera } = useThree();
   
   useEffect(() => {
-    // Position camera slightly above and behind character
     camera.position.set(
       characterPosition[0],
-      characterPosition[1] + 1.7, // Eye height
+      characterPosition[1] + 1.7,
       characterPosition[2]
     );
   }, [camera, characterPosition]);
@@ -261,14 +259,12 @@ const CameraController = ({
     if (isChanging && !isFirstPerson) {
       const zone = getZoneById(targetZoneId);
       if (zone && controlsRef.current) {
-        // Set new camera position and target
         camera.position.set(...zone.position);
         controlsRef.current.target.set(0, 0, 0);
       }
     }
   }, [targetZoneId, isChanging, camera, isFirstPerson]);
   
-  // Only render controls if not in first-person mode
   if (isFirstPerson) return null;
   
   return (
@@ -279,7 +275,7 @@ const CameraController = ({
       enableRotate={true}
       minDistance={2}
       maxDistance={20}
-      maxPolarAngle={Math.PI / 2 - 0.1} // Prevent going below ground
+      maxPolarAngle={Math.PI / 2 - 0.1}
     />
   );
 };
@@ -305,9 +301,10 @@ const GardenScene = ({
     currentZone.plants.includes(plant.id.toString())
   );
   
-  const handlePlantClick = (scene: THREE.Scene, plantId: string) => {
-    onPlantSelect(scene);
-    setActivePlant(plantId);
+  const handlePlantClick = (plantData: any) => {
+    console.log('Plant clicked in scene:', plantData);
+    onPlantSelect(plantData);
+    setActivePlant(plantData.id);
   };
   
   return (
@@ -370,10 +367,11 @@ const GardenScene = ({
                 scale={plant.scale}
                 model={plant.model}
                 // Pass a callback that receives the loaded THREE.Scene from Plant3D
-                onClick={(scene: THREE.Scene) => handlePlantClick(scene, plant.id.toString())}
+                onClick={handlePlantClick}
                 isRaining={isRaining}
                 isNightMode={isNightMode}
                 color={plant.color}
+                plantData={plant}
               />
             );
           })}

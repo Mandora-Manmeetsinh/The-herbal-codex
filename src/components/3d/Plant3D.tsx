@@ -5,35 +5,22 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
 
-// Define more specific types for our GLTF result
 type GLTFResult = GLTF & {
   nodes: Record<string, THREE.Mesh>;
   materials: Record<string, THREE.Material>;
   animations: THREE.AnimationClip[];
 };
-// ...existing code...
 
 interface PlantProps {
   position: [number, number, number];
   rotation?: [number, number, number];
   scale?: number;
   model: string;
-  onClick: (scene: THREE.Scene) => void;
+  onClick: (plantData: any) => void;
   isRaining: boolean;
   isNightMode: boolean;
   color?: string;
-}
-
-// ...existing code...
-interface PlantProps {
-  position: [number, number, number];
-  rotation?: [number, number, number];
-  scale?: number;
-  model: string;
-  onClick: (scene: THREE.Scene) => void;
-  isRaining: boolean;
-  isNightMode: boolean;
-  color?: string; // Added color prop for fallback geometry
+  plantData?: any; // Add plant data prop
 }
 
 const Plant3D = ({ 
@@ -44,35 +31,29 @@ const Plant3D = ({
   onClick, 
   isRaining,
   isNightMode,
-  color = "#2D6A4F" // Default color if none provided
+  color = "#2D6A4F",
+  plantData
 }: PlantProps) => {
-  // Use a ref for the group, typed as THREE.Group
   const group = useRef<THREE.Group>(null);
   const [modelError, setModelError] = useState(false);
   const [hovered, setHovered] = useState(false);
   
-  // Always call the hook unconditionally
   const gltfResult = useGLTF(model);
   
-  // Handle errors after trying to load the model - only run this effect when needed
   useEffect(() => {
-    // Only check for model loading errors if we have a result to check
     if (gltfResult && !gltfResult.scene) {
       console.error(`Failed to load model ${model}`);
       setModelError(true);
     }
   }, [gltfResult, model]);
   
-  // Animations are only available if model loaded successfully
   const { actions } = useAnimations(
     !modelError && gltfResult?.animations ? gltfResult.animations : [], 
     group
   );
   
-  // Try to play animations if available
   useEffect(() => {
     if (!modelError && gltfResult?.animations && gltfResult.animations.length > 0 && actions) {
-      // Play the first animation if it exists
       const firstAnimation = Object.keys(actions)[0];
       if (firstAnimation) {
         actions[firstAnimation]?.play();
@@ -80,33 +61,34 @@ const Plant3D = ({
     }
   }, [actions, modelError, gltfResult]);
   
-  // Handle hover effect
   useEffect(() => {
     document.body.style.cursor = hovered ? 'pointer' : 'auto';
   }, [hovered]);
   
-  // Make plants sway slightly
   useFrame((state) => {
     if (group.current) {
       const windStrength = isRaining ? 0.05 : 0.02;
       const swayAmount = Math.sin(state.clock.elapsedTime) * windStrength;
       group.current.rotation.z = rotation[2] + swayAmount;
-      
-      // Slight rotation on y-axis too
       group.current.rotation.y = rotation[1] + Math.sin(state.clock.elapsedTime * 0.5) * windStrength;
     }
   });
   
-  // Check if model failed to load immediately (for static known failures)
   const hasModelError = modelError || !gltfResult || gltfResult instanceof Error;
-
-  // Adjust color based on night mode
   const plantColor = isNightMode 
-    ? new THREE.Color(color).multiplyScalar(0.5).getHexString() // Darker at night
+    ? new THREE.Color(color).multiplyScalar(0.5).getHexString()
     : color;
   
-  // Visual effects for night mode
   const emissiveIntensity = isNightMode ? 0.2 : 0;
+  
+  const handleClick = (e: any) => {
+    e.stopPropagation();
+    console.log('Plant clicked:', plantData);
+    // Pass the plant data instead of the scene
+    if (plantData) {
+      onClick(plantData);
+    }
+  };
   
   return (
     <group 
@@ -114,19 +96,12 @@ const Plant3D = ({
       position={position}
       rotation={rotation as [number, number, number]}
       scale={[scale, scale, scale]}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (gltfResult?.scene && gltfResult.scene instanceof THREE.Scene) {
-          onClick(gltfResult.scene);
-        }
-      }}
+      onClick={handleClick}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
-      {/* If model failed to load, show a fallback geometry */}
       {hasModelError ? (
         <group>
-          {/* Base/stem */}
           <mesh position={[0, 0.5, 0]}>
             <cylinderGeometry args={[0.2, 0.2, 1, 8]} />
             <meshStandardMaterial 
@@ -136,7 +111,6 @@ const Plant3D = ({
             />
           </mesh>
           
-          {/* Plant top/leaves/flower */}
           <mesh position={[0, 1.2, 0]}>
             <sphereGeometry args={[0.8, 16, 16]} />
             <meshStandardMaterial 
@@ -147,27 +121,22 @@ const Plant3D = ({
           </mesh>
         </group>
       ) : (
-        /* If model loaded successfully, show it with adjusted materials for night mode */
         <primitive 
           object={gltfResult?.scene} 
-          // Apply night mode effect to loaded model
           onAfterRender={() => {
             if (isNightMode && gltfResult?.scene) {
               gltfResult.scene.traverse((child: THREE.Object3D) => {
                 if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).material) {
                   const mesh = child as THREE.Mesh & { material: THREE.MeshStandardMaterial; userData: Record<string, unknown> };
-                  // Store original colors if not already stored
                   if (!mesh.userData.originalColor) {
                     mesh.userData.originalColor = mesh.material.color.clone();
                   }
                   
                   if (isNightMode) {
-                    // Darken the color for night mode
                     mesh.material.color.copy(mesh.userData.originalColor).multiplyScalar(0.5);
                     mesh.material.emissive = new THREE.Color(0x112211);
                     mesh.material.emissiveIntensity = 0.2;
                   } else {
-                    // Restore original color
                     if (mesh.userData.originalColor) {
                       mesh.material.color.copy(mesh.userData.originalColor);
                       mesh.material.emissive = new THREE.Color(0x000000);
@@ -181,10 +150,8 @@ const Plant3D = ({
         />
       )}
       
-      {/* Apply hover effect */}
       {hovered && (
         <group>
-          {/* This is a visual indicator for hover state */}
           <mesh position={[0, hasModelError ? 2 : 0.5, 0]} scale={[0.2, 0.2, 0.2]}>
             <sphereGeometry args={[1, 16, 16]} />
             <meshBasicMaterial color="#52B788" transparent opacity={0.5} />
@@ -192,7 +159,6 @@ const Plant3D = ({
         </group>
       )}
 
-      {/* Add firefly effect at night */}
       {isNightMode && (
         <group>
           {[...Array(3)].map((_, i) => (
