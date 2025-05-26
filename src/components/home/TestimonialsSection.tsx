@@ -41,8 +41,9 @@ const TestimonialsSection = () => {
       { threshold: 0.2 }
     );
     
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    const currentSection = sectionRef.current;
+    if (currentSection) {
+      observer.observe(currentSection);
     }
     
     const interval = setInterval(() => {
@@ -50,8 +51,8 @@ const TestimonialsSection = () => {
     }, 5000);
     
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
+      if (currentSection) {
+        observer.unobserve(currentSection);
       }
       clearInterval(interval);
     };

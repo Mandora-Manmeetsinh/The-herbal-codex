@@ -11,13 +11,26 @@ type GLTFResult = GLTF & {
   materials: Record<string, THREE.Material>;
   animations: THREE.AnimationClip[];
 };
+// ...existing code...
 
 interface PlantProps {
   position: [number, number, number];
   rotation?: [number, number, number];
   scale?: number;
   model: string;
-  onClick: () => void;
+  onClick: (scene: THREE.Scene) => void;
+  isRaining: boolean;
+  isNightMode: boolean;
+  color?: string;
+}
+
+// ...existing code...
+interface PlantProps {
+  position: [number, number, number];
+  rotation?: [number, number, number];
+  scale?: number;
+  model: string;
+  onClick: (scene: THREE.Scene) => void;
   isRaining: boolean;
   isNightMode: boolean;
   color?: string; // Added color prop for fallback geometry
@@ -33,19 +46,13 @@ const Plant3D = ({
   isNightMode,
   color = "#2D6A4F" // Default color if none provided
 }: PlantProps) => {
-  // Use any to bypass the type mismatch issues with the Three.js version
-  const group = useRef<any>(null);
+  // Use a ref for the group, typed as THREE.Group
+  const group = useRef<THREE.Group>(null);
   const [modelError, setModelError] = useState(false);
   const [hovered, setHovered] = useState(false);
   
-  // Try to load the model using a memoized approach to prevent infinite renders
-  let gltfResult;
-  try {
-    gltfResult = useGLTF(model);
-  } catch (error) {
-    // This catch will handle synchronous errors, but not async loading failures
-    console.error(`Error loading model ${model}:`, error);
-  }
+  // Always call the hook unconditionally
+  const gltfResult = useGLTF(model);
   
   // Handle errors after trying to load the model - only run this effect when needed
   useEffect(() => {
@@ -109,7 +116,9 @@ const Plant3D = ({
       scale={[scale, scale, scale]}
       onClick={(e) => {
         e.stopPropagation();
-        onClick();
+        if (gltfResult?.scene && gltfResult.scene instanceof THREE.Scene) {
+          onClick(gltfResult.scene);
+        }
       }}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
@@ -144,24 +153,25 @@ const Plant3D = ({
           // Apply night mode effect to loaded model
           onAfterRender={() => {
             if (isNightMode && gltfResult?.scene) {
-              gltfResult.scene.traverse((child: any) => {
-                if (child.isMesh && child.material) {
+              gltfResult.scene.traverse((child: THREE.Object3D) => {
+                if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).material) {
+                  const mesh = child as THREE.Mesh & { material: THREE.MeshStandardMaterial; userData: Record<string, unknown> };
                   // Store original colors if not already stored
-                  if (!child.userData.originalColor) {
-                    child.userData.originalColor = child.material.color.clone();
+                  if (!mesh.userData.originalColor) {
+                    mesh.userData.originalColor = mesh.material.color.clone();
                   }
                   
                   if (isNightMode) {
                     // Darken the color for night mode
-                    child.material.color.copy(child.userData.originalColor).multiplyScalar(0.5);
-                    child.material.emissive = new THREE.Color(0x112211);
-                    child.material.emissiveIntensity = 0.2;
+                    mesh.material.color.copy(mesh.userData.originalColor).multiplyScalar(0.5);
+                    mesh.material.emissive = new THREE.Color(0x112211);
+                    mesh.material.emissiveIntensity = 0.2;
                   } else {
                     // Restore original color
-                    if (child.userData.originalColor) {
-                      child.material.color.copy(child.userData.originalColor);
-                      child.material.emissive = new THREE.Color(0x000000);
-                      child.material.emissiveIntensity = 0;
+                    if (mesh.userData.originalColor) {
+                      mesh.material.color.copy(mesh.userData.originalColor);
+                      mesh.material.emissive = new THREE.Color(0x000000);
+                      mesh.material.emissiveIntensity = 0;
                     }
                   }
                 }

@@ -8,7 +8,7 @@ import { Book, Filter, List, Grid, ChevronDown } from 'lucide-react';
 
 // Enhanced plant data with more details
 const plantsData = [
-  {
+  { 
     id: 1,
     name: "Lavender",
     scientificName: "Lavandula angustifolia",

@@ -4,7 +4,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 
 interface LayoutProps {
-  children: ReactNode;
+  children: ReactNode; 
   fullHeight?: boolean;
 }
 

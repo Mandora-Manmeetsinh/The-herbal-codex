@@ -9,7 +9,7 @@ import GardenExplorer from "./pages/GardenExplorer";
 import PlantLibrary from "./pages/PlantLibrary";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
+import NotFound from "./pages/NotFound"; 
 
 const queryClient = new QueryClient();
 

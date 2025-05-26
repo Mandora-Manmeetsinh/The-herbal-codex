@@ -11,7 +11,7 @@ import CinematicGardenPreview from '../components/home/CinematicGardenPreview';
 const Index = () => {
   return (
     <Layout fullHeight={true}>
-      <HeroSection />
+      <HeroSection /> 
       <FeaturesSection />
       <CinematicGardenPreview />
       <PlantGallery />

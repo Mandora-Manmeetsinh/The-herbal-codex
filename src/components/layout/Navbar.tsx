@@ -6,7 +6,7 @@ import { Menu, X, Leaf } from 'lucide-react';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  return (
+  return ( 
     <nav className="bg-white bg-opacity-90 backdrop-blur-sm fixed w-full z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">

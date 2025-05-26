@@ -5,7 +5,7 @@ import { Info } from 'lucide-react';
 
 interface PlantCardProps {
   plant: {
-    id: number;
+    id: number; 
     name: string;
     scientificName: string;
     image: string;

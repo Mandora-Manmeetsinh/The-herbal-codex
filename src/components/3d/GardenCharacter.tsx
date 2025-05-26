@@ -10,8 +10,7 @@ interface GardenCharacterProps {
 }
 
 const GardenCharacter = ({ position, onMove }: GardenCharacterProps) => {
-  // Changed from THREE.Mesh to any to avoid type conflicts
-  const characterRef = useRef<any>(null);
+  const characterRef = useRef<THREE.Mesh>(null);
   const [moveForward, setMoveForward] = useState(false);
   const [moveBackward, setMoveBackward] = useState(false);
   const [moveLeft, setMoveLeft] = useState(false);

@@ -26,14 +26,16 @@ const PlantGallery = () => {
       },
       { threshold: 0.1 }
     );
+
+    const currentGallery = galleryRef.current;
     
-    if (galleryRef.current) {
-      observer.observe(galleryRef.current);
+    if (currentGallery) {
+      observer.observe(currentGallery);
     }
     
     return () => {
-      if (galleryRef.current) {
-        observer.unobserve(galleryRef.current);
+      if (currentGallery) {
+        observer.unobserve(currentGallery);
       }
     };
   }, []);

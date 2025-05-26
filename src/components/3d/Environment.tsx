@@ -14,9 +14,9 @@ interface EnvironmentProps {
 
 const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, groundColor }: EnvironmentProps) => {
   const { scene } = useThree();
-  // Use any to bypass the type mismatch issues with the Three.js version
-  const rainRef = useRef<any>(null);
-  const firefliesRef = useRef<any>(null);
+  // Use explicit type for Three.js Points
+  const rainRef = useRef<THREE.Points | null>(null);
+  const firefliesRef = useRef<THREE.Points | null>(null);
   
   // Current zone data
   const zoneData = getZoneById(zoneId);
@@ -45,21 +45,21 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
       });
       
       if (rainRef.current) {
-        (scene as any).remove(rainRef.current);
+        (scene as THREE.Scene).remove(rainRef.current);
       }
       
       const rain = new THREE.Points(geometry, material);
       rainRef.current = rain;
       // Use type assertion to overcome the type incompatibility
-      (scene as any).add(rain);
+      (scene as THREE.Scene).add(rain);
     } else if (rainRef.current) {
-      (scene as any).remove(rainRef.current);
+      (scene as THREE.Scene).remove(rainRef.current);
       rainRef.current = null;
     }
     
     return () => {
       if (rainRef.current) {
-        (scene as any).remove(rainRef.current);
+        (scene as THREE.Scene).remove(rainRef.current);
       }
     };
   }, [isRaining, scene]);
@@ -67,7 +67,7 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
   // Create fireflies for night mode
   useEffect(() => {
     if (isNightMode) {
-      // Create many small points of light that will be fireflies
+      // Create mTHREE.Scene small points of light that will be fireflies
       const fireflyCount = 200;
       const positions = new Float32Array(fireflyCount * 3);
       const scales = new Float32Array(fireflyCount);
@@ -95,20 +95,20 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
       });
       
       if (firefliesRef.current) {
-        (scene as any).remove(firefliesRef.current);
+        (scene as THREE.Scene).remove(firefliesRef.current);
       }
       
       const fireflies = new THREE.Points(geometry, material);
       firefliesRef.current = fireflies;
-      (scene as any).add(fireflies);
+      (scene as THREE.Scene).add(fireflies);
     } else if (firefliesRef.current) {
-      (scene as any).remove(firefliesRef.current);
+      (scene as THREE.Scene).remove(firefliesRef.current);
       firefliesRef.current = null;
     }
     
     return () => {
       if (firefliesRef.current) {
-        (scene as any).remove(firefliesRef.current);
+        (scene as THREE.Scene).remove(firefliesRef.current);
       }
     };
   }, [isNightMode, scene]);
@@ -324,7 +324,7 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
         }
         break;
         
-      case "floral":
+      case "floral": {
         // Floral zone - colorful and vibrant
         
         // Add flower beds
@@ -386,8 +386,9 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
           </group>
         );
         break;
+      }
         
-      default:
+      default: {
         // Garden benches as fallback
         const benchPositions = [
           [4, 0, -6],
@@ -421,6 +422,7 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
             </group>
           );
         });
+      }
     }
     
     return elements;
@@ -500,18 +502,18 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
       {/* Clouds - fewer at night */}
       {!isRaining && !isNightMode && (
         <>
-          {/* Using any type casting to bypass the type checking for Cloud args */}
-          <Cloud position={[-10, 15, 0]} args={[3, 2] as any} />
-          <Cloud position={[10, 18, -10]} args={[4, 2] as any} />
-          <Cloud position={[0, 20, 10]} args={[3.5, 2] as any} />
+          {/* Clouds for daytime */}
+          <Cloud position={[-10, 15, 0]} />
+          <Cloud position={[10, 18, -10]} />
+          <Cloud position={[0, 20, 10]} />
         </>
       )}
       
       {!isRaining && isNightMode && (
         <>
           {/* Fewer, darker clouds at night */}
-          <Cloud position={[-20, 20, -10]} args={[5, 2] as any} color="#333333" />
-          <Cloud position={[15, 25, 5]} args={[6, 2] as any} color="#333333" />
+          <Cloud position={[-20, 20, -10]} color="#333333" />
+          <Cloud position={[15, 25, 5]} color="#333333" />
         </>
       )}
       

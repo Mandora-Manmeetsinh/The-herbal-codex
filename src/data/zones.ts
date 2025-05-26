@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Leaf, Wind, Shield, Flower } from "lucide-react";
 
 export type PlantZone = {

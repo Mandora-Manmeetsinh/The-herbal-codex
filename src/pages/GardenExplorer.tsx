@@ -17,7 +17,14 @@ const GardenExplorer = () => {
   const queryParams = new URLSearchParams(location.search);
   const zoneParam = queryParams.get('zone');
 
-  const [selectedPlant, setSelectedPlant] = useState<any | null>(null);
+  interface Plant {
+    id: string;
+    name: string;
+    // Add more specific fields as needed, for example:
+    description?: string;
+    imageUrl?: string;
+  }
+  const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
   const [isRaining, setIsRaining] = useState(false);
   const [isNightMode, setIsNightMode] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
@@ -31,8 +38,17 @@ const GardenExplorer = () => {
   const activeZone = zones.find(zone => zone.id === currentZone) || zones[0];
   const zonePlantsCount = activeZone ? activeZone.plants.length : 0;
   
-  const handlePlantSelect = (plant: any) => {
-    setSelectedPlant(plant);
+  // Accepts Scene type and maps to Plant type
+  // Scene type assumed: { id: number; name: string; description?: string; imageUrl?: string }
+  const handlePlantSelect = (plantData: { id: number; name: string; description?: string; imageUrl?: string }) => {
+    // Map Scene to Plant (convert id to string)
+    const mappedPlant = {
+      id: String(plantData.id),
+      name: plantData.name,
+      description: plantData.description,
+      imageUrl: plantData.imageUrl,
+    };
+    setSelectedPlant(mappedPlant);
     setShowInstructions(false);
     setShowSymptomFinder(false);
   };

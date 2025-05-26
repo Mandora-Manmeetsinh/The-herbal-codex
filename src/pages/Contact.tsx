@@ -28,9 +28,10 @@ const Contact = () => {
       },
       { threshold: 0.2 }
     );
-    
-    if (formRef.current) {
-      observer.observe(formRef.current);
+
+    const formNode = formRef.current;
+    if (formNode) {
+      observer.observe(formNode);
     }
     
     const handleScroll = () => {
@@ -50,8 +51,8 @@ const Contact = () => {
     window.addEventListener('mousemove', handleMouseMove);
     
     return () => {
-      if (formRef.current) {
-        observer.unobserve(formRef.current);
+      if (formNode) {
+        observer.unobserve(formNode);
       }
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);

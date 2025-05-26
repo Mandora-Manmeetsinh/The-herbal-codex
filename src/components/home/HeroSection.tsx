@@ -9,7 +9,7 @@ const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
   
-  useEffect(() => {
+  useEffect(() => { 
     setIsVisible(true);
     
     const handleScroll = () => {

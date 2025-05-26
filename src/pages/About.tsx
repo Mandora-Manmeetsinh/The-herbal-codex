@@ -55,6 +55,7 @@ const About = () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   const isVisible = (sectionId: string) => visibleSections.includes(sectionId);
@@ -349,7 +350,7 @@ const About = () => {
                         </p>
                         <a 
                           href="/contact" 
-                          className="inline-block px-6 py-2 bg-herb-green-dark text-white rounded-full hover:bg-herb-green transition-colors transform hover:scale-105 active:scale-95 transition-all duration-300"
+                          className="inline-block px-6 py-2 bg-herb-green-dark text-white rounded-full hover:bg-herb-green transition-colors transform hover:scale-105 active:scale-95 duration-300"
                         >
                           Get In Touch
                         </a>

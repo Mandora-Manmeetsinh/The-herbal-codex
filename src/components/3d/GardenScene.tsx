@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Sky, Stars } from '@react-three/drei';
+// Removed direct import of OrbitControlsImpl from 'three/examples/jsm/controls/OrbitControls'
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import Plant3D from './Plant3D';
 import Environment from './Environment';
 import LoadingScreen from '../ui/LoadingScreen';
@@ -8,7 +10,7 @@ import { getZoneById, zones } from '@/data/zones';
 import GardenCharacter from './GardenCharacter';
 
 interface GardenSceneProps {
-  onPlantSelect: (plantData: any) => void;
+  onPlantSelect: (plantData: THREE.Scene) => void;
   isRaining: boolean;
   isNightMode: boolean;
   currentZoneId: string;
@@ -252,8 +254,8 @@ const CameraController = ({
   isChanging: boolean,
   isFirstPerson: boolean
 }) => {
+  const controlsRef = useRef<OrbitControlsImpl>(null);
   const { camera } = useThree();
-  const controlsRef = useRef<any>(null);
   
   useEffect(() => {
     if (isChanging && !isFirstPerson) {
@@ -303,9 +305,9 @@ const GardenScene = ({
     currentZone.plants.includes(plant.id.toString())
   );
   
-  const handlePlantClick = (plant: any) => {
-    onPlantSelect(plant);
-    setActivePlant(plant.id);
+  const handlePlantClick = (scene: THREE.Scene, plantId: string) => {
+    onPlantSelect(scene);
+    setActivePlant(plantId);
   };
   
   return (
@@ -367,7 +369,8 @@ const GardenScene = ({
                 rotation={plant.rotation}
                 scale={plant.scale}
                 model={plant.model}
-                onClick={() => handlePlantClick(plant)}
+                // Pass a callback that receives the loaded THREE.Scene from Plant3D
+                onClick={(scene: THREE.Scene) => handlePlantClick(scene, plant.id.toString())}
                 isRaining={isRaining}
                 isNightMode={isNightMode}
                 color={plant.color}
@@ -403,3 +406,14 @@ const GardenScene = ({
 };
 
 export default GardenScene;
+
+interface PlantProps {
+  position: [number, number, number];
+  rotation?: [number, number, number];
+  scale?: number;
+  model: string;
+  onClick: (scene: THREE.Scene) => void;
+  isRaining: boolean;
+  isNightMode: boolean;
+  color?: string; // Added color prop for fallback geometry
+}

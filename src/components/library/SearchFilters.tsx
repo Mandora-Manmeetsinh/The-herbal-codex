@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Search } from 'lucide-react';
-
+ 
 interface SearchFiltersProps {
   onSearch: (searchTerm: string) => void;
   onFilterChange: (filters: {
