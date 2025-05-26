@@ -9,35 +9,35 @@ const FeaturedPlantsSection = () => {
     {
       id: 1,
       name: 'Lavender',
-      image: '/plants/lavender.jpg',
+      image: '/plants/lavender.png',
       benefits: 'Calming, stress relief, sleep aid',
       description: 'Known for its distinctive fragrance and purple blooms, lavender has been used for centuries to reduce anxiety and promote better sleep.'
     },
     {
       id: 2,
       name: 'Aloe Vera',
-      image: '/plants/aloe.jpg',
+      image: '/plants/aloe.png',
       benefits: 'Skin healing, digestive health',
       description: 'This succulent plant contains a gel-like substance that is widely used for treating burns, skin irritations, and supporting digestive health.'
     },
     {
       id: 3,
       name: 'Turmeric',
-      image: '/plants/turmeric.jpg',
+      image: '/plants/turmeric.png',
       benefits: 'Anti-inflammatory, antioxidant',
       description: 'The golden yellow spice derived from turmeric root has powerful anti-inflammatory and antioxidant properties that can help reduce chronic inflammation.'
     },
     {
       id: 4,
       name: 'Peppermint',
-      image: '/plants/peppermint.jpg',
+      image: '/plants/peppermint.png',
       benefits: 'Digestive aid, headache relief',
       description: 'With its refreshing scent and cooling sensation, peppermint has been used to soothe digestive issues and provide relief from tension headaches.'
     },
     {
       id: 5,
       name: 'Chamomile',
-      image: '/plants/chamomile.jpg',
+      image: '/plants/chamomile.png',
       benefits: 'Relaxation, sleep improvement, skin care',
       description: 'This daisy-like flower is commonly used in teas to promote relaxation, improve sleep quality, and reduce inflammation.'
     }

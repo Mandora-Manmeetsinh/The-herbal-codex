@@ -7,14 +7,14 @@ const PlantGallery = () => {
 
   // Sample plant images data with descriptions
   const plantImages = [
-    { src: '/plants/lavender.jpg', name: 'Lavender', description: 'Known for its calming properties' },
-    { src: '/plants/aloe.jpg', name: 'Aloe Vera', description: 'Natural skin healing' },
-    { src: '/plants/chamomile.jpg', name: 'Chamomile', description: 'Sleep aid and relaxation' },
-    { src: '/plants/echinacea.jpg', name: 'Echinacea', description: 'Immune system support' },
-    { src: '/plants/ginger.jpg', name: 'Ginger', description: 'Digestive aid and anti-inflammatory' },
-    { src: '/plants/peppermint.jpg', name: 'Peppermint', description: 'Refreshing and digestive relief' },
-    { src: '/plants/turmeric.jpg', name: 'Turmeric', description: 'Anti-inflammatory properties' },
-    { src: '/plants/valerian.jpg', name: 'Valerian', description: 'Natural sleep aid' }
+    { src: '/plants/lavender.png', name: 'Lavender', description: 'Known for its calming properties' },
+    { src: '/plants/aloe.png', name: 'Aloe Vera', description: 'Natural skin healing' },
+    { src: '/plants/chamomile.png', name: 'Chamomile', description: 'Sleep aid and relaxation' },
+    { src: '/plants/echinacea.png', name: 'Echinacea', description: 'Immune system support' },
+    { src: '/plants/ginger.png', name: 'Ginger', description: 'Digestive aid and anti-inflammatory' },
+    { src: '/plants/peppermint.png', name: 'Peppermint', description: 'Refreshing and digestive relief' },
+    { src: '/plants/turmeric.png', name: 'Turmeric', description: 'Anti-inflammatory properties' },
+    { src: '/plants/valerian.png', name: 'Valerian', description: 'Natural sleep aid' }
   ];
 
   useEffect(() => {
