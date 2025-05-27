@@ -8,8 +8,23 @@ import LoadingScreen from '../ui/LoadingScreen';
 import { getZoneById, zones } from '@/data/zones';
 import GardenCharacter from './GardenCharacter';
 
+interface PlantType {
+  id: string | number;
+  name: string;
+  scientificName: string;
+  model: string;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: number;
+  description: string;
+  uses: string;
+  nativeRegions: string;
+  growingConditions: string;
+  color: string;
+}
+
 interface GardenSceneProps {
-  onPlantSelect: (plantData: any) => void;
+  onPlantSelect: (plantData: PlantType) => void;
   isRaining: boolean;
   isNightMode: boolean;
   currentZoneId: string;
@@ -290,7 +305,13 @@ const GardenScene = ({
   characterPosition,
   onCharacterMove
 }: GardenSceneProps) => {
-  const [activePlant, setActivePlant] = useState<string | null>(null);
+  const [activePlant, setActivePlant] = useState<string | number | null>(null);
+
+  const handlePlantClick = (plantData: PlantType) => {
+    console.log('Plant clicked in scene:', plantData);
+    onPlantSelect(plantData);
+    setActivePlant(plantData.id);
+  };
   
   // Get current zone data
   const currentZone = getZoneById(currentZoneId) || zones[0];
@@ -300,12 +321,6 @@ const GardenScene = ({
   const zonePlants = plants.filter(plant => 
     currentZone.plants.includes(plant.id.toString())
   );
-  
-  const handlePlantClick = (plantData: any) => {
-    console.log('Plant clicked in scene:', plantData);
-    onPlantSelect(plantData);
-    setActivePlant(plantData.id);
-  };
   
   return (
     <div className="canvas-container">

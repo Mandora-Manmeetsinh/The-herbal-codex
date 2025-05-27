@@ -4,6 +4,7 @@ import { useGLTF, useAnimations } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
+import type { ThreeEvent } from '@react-three/fiber';
 
 type GLTFResult = GLTF & {
   nodes: Record<string, THREE.Mesh>;
@@ -16,11 +17,11 @@ interface PlantProps {
   rotation?: [number, number, number];
   scale?: number;
   model: string;
-  onClick: (plantData: any) => void;
+  onClick: (plantData: unknown) => void;
   isRaining: boolean;
   isNightMode: boolean;
   color?: string;
-  plantData?: any; // Add plant data prop
+  plantData?: unknown; // Add plant data prop
 }
 
 const Plant3D = ({ 
@@ -78,10 +79,9 @@ const Plant3D = ({
   const plantColor = isNightMode 
     ? new THREE.Color(color).multiplyScalar(0.5).getHexString()
     : color;
-  
   const emissiveIntensity = isNightMode ? 0.2 : 0;
   
-  const handleClick = (e: any) => {
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
     console.log('Plant clicked:', plantData);
     // Pass the plant data instead of the scene
@@ -89,7 +89,7 @@ const Plant3D = ({
       onClick(plantData);
     }
   };
-  
+
   return (
     <group 
       ref={group} 
