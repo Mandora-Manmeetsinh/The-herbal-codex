@@ -359,8 +359,8 @@ const About = () => {
                   );
                 }
                 
-                const name = member === 'botanist' ? 'Dr. Sofia Chen' : 'Marcus Johnson';
-                const role = member === 'botanist' ? 'Lead Botanist' : 'Tech Lead';
+                const name = member === 'botanist' ? 'Mandora Manmeetsinh' : 'Astha Kharadi';
+                const role = member === 'botanist' ? 'Backend Devloper , Team Leader' : 'Frontend Developer , UI/UX Designer';
                 const description = member === 'botanist' 
                   ? 'With a PhD in Ethnobotany, Sofia brings extensive knowledge of medicinal plants from around the world.'
                   : 'A specialist in 3D visualization and web technologies, Marcus leads our development team.';
@@ -375,10 +375,10 @@ const About = () => {
                       transition: 'all 0.8s cubic-bezier(0.23, 1, 0.32, 1)',
                       transitionDelay: `${idx * 200}ms`
                     }}
-                  >
+                  > 
                     <div className="relative h-64 overflow-hidden">
                       <img 
-                        src={`/team/${member}.jpg`} 
+                        src={`/team/${member}.png`} 
                         alt={name} 
                         className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
                       />
