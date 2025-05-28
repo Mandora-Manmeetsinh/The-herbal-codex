@@ -99,7 +99,9 @@ const Footer = () => {
             <ul className="space-y-4 text-gray-200">
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 mr-3 mt-0.5 text-herb-gold" />
-                <span>123 Botany Lane, Greenville, Earth</span>
+                <span className="hover:underline hover:text-herb-gold transition-colors duration-150">
+                  123 Herbal Lane, Green City, HC 12345
+                </span>
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 mr-3 text-herb-gold" />
@@ -109,8 +111,8 @@ const Footer = () => {
               </li>
               <li className="flex items-center">
                 <Phone className="h-5 w-5 mr-3 text-herb-gold" />
-                <a href="tel:+11234567890" className="hover:underline hover:text-herb-gold transition-colors duration-150">
-                  +1 (123) 456-7890
+                <a href="tel:8794641680" className="hover:underline hover:text-herb-gold transition-colors duration-150">
+                  8794641680
                 </a>
               </li>
             </ul>
