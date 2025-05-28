@@ -263,7 +263,7 @@ const About = () => {
                 <div className="relative overflow-hidden rounded-lg shadow-lg perspective">
                   <div className="transform transition-transform duration-700 hover:scale-105">
                     <img 
-                      src="/plants/lavender.jpg" 
+                      src="/plants/lavender.png" 
                       alt="Herbal garden" 
                       className="w-full h-auto"
                     />
