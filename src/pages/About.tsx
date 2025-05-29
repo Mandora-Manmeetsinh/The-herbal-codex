@@ -349,7 +349,7 @@ const About = () => {
                           We're always looking for passionate people to join our mission.
                         </p>
                         <a 
-                          href="/contact" 
+                          href="/Contact" 
                           className="inline-block px-6 py-2 bg-herb-green-dark text-white rounded-full hover:bg-herb-green transition-colors transform hover:scale-105 active:scale-95 duration-300"
                         >
                           Get In Touch
