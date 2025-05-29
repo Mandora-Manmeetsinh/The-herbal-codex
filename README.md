@@ -1,105 +1,117 @@
-# 🌿 The Herbal Codex
 
-> **An Interactive 3D Herbal Garden for Exploration, Learning, and Fun!** 🚀
+# 🌿 The Herbal Codex  
+**An Interactive 3D Herbal Garden for Exploration, Learning, and Fun!** 🚀  
 
 ---
 
 ## 📖 Project Overview
 
-**The Herbal Codex** is a 3D interactive web application that allows users to explore a virtual herbal garden filled with beautifully rendered medicinal plants. Users can learn about each plant's **scientific details**, **traditional uses**, **medicinal benefits**, and **growth methods** — in an engaging, immersive experience.
+**The Herbal Codex** is a **3D interactive web application** that lets users explore a virtual herbal garden filled with beautifully rendered **medicinal plants**. Each plant features detailed information including:
+- ✅ **Scientific names**
+- ✅ **Medicinal uses**
+- ✅ **Traditional benefits**
+- ✅ **Growing conditions**
 
-It combines **education** and **entertainment**, making herbal knowledge accessible and enjoyable for everyone!
+Users can walk through the garden, interact with animated plants, and enjoy an **immersive learning experience**. The project blends **education**, **technology**, and **visual storytelling** to make herbal knowledge **accessible, engaging, and fun for everyone**.
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-- 🎮 **3D Herbal Garden** - Walk around and interact with realistic herbal plants.
-- 🌱 **Interactive Plant Animations** - Plants sway, bloom, and react when clicked.
-- 🎙️ **Voice Narration** - Auto-reads plant information for an immersive experience.
-- 🔍 **Search & Filter** - Find plants by medicinal benefits, region, or conditions.
-- 🌦️ **Dynamic Weather Effects** - Toggle between sunny and rainy garden views.
-- 📚 **Learning Gamification** - (Upcoming) Quizzes and challenges for users.
-- 🌍 **Multilingual Support** - (Upcoming) Explore information in multiple languages.
-- 📱 **Fully Responsive** - Smooth experience on Desktop, Tablet, and Mobile.
-- 📸 **Social Sharing** - (Upcoming) Bookmark and share your favorite plants!
+- 🎮 **3D Herbal Garden** – Explore a navigable space with realistic plants in a garden setting.
+- 🌱 **Interactive Animations** – Plants respond with bloom/sway effects on interaction.
+- 🎙️ **Voice Narration** – Auto-reads plant information aloud using Web Speech API.
+- 🔍 **Smart Search & Filter** – Find plants based on medicinal benefit, region, or usage.
+- 🌦️ **Dynamic Weather** – Switch between sunny and rainy garden environments.
+- 📚 **Gamified Learning** *(Upcoming)* – Quizzes, achievements, and plant challenges.
+- 🌍 **Multilingual Support** *(Upcoming)* – Information available in Hindi, Gujarati, etc.
+- 📱 **Fully Responsive** – Works seamlessly across desktop, tablet, and mobile.
+- 📸 **Social Sharing & Bookmarks** *(Upcoming)* – Save and share your favorite herbs.
 
 ---
 
 ## 🚀 Tech Stack
 
-| Tech                | Usage                           |
-|---------------------|---------------------------------|
-| **React.js**         | Frontend Web Application        |
-| **Three.js**         | 3D Rendering via React-Three-Fiber |
-| **React-Three-Fiber**| React bindings for Three.js     |
-| **React-Spring**     | Smooth Animations in 3D Space   |
-| **Web Speech API**   | Voice Narration Feature         |
-| **CSS3**             | Styling and Responsive Design   |
+| Tech                 | Purpose                                  |
+|----------------------|------------------------------------------|
+| **React.js**         | Building the user interface              |
+| **Three.js**         | 3D rendering engine                      |
+| **React-Three-Fiber**| React bindings for Three.js              |
+| **React-Spring**     | Smooth 3D animations                     |
+| **Web Speech API**   | Real-time voice narration of plant data |
+| **CSS3**             | Styling and responsiveness               |
 
 ---
 
-## 🛠️ How to Run Locally
+## 🛠️ How to Run the Project Locally
 
-1. Install **Node.js** and **npm** (if not already installed).
-2. Clone the repository:
-   ```bash
-   git clone https://github.com/Mandora-Manmeetsinh/herbal-codex.git
-   ```
-3. Navigate into the project directory:
-   ```bash
-   cd herbal-codex
-   ```
-4. Install project dependencies:
-   ```bash
-   npm install
-   ```
-5. Start the development server:
-   ```bash
-   npm start
-   ```
-6. Open your browser and visit:
-   ```
-   http://localhost:3000
-   ```
+### 🧑‍💻 Prerequisites
+Make sure you have the following installed:
+- [Node.js](https://nodejs.org/) (v16 or higher recommended)
+- npm (comes with Node.js)
+
+### 📦 Installation Steps
+
+```bash
+# Step 1: Clone the repository
+git clone https://github.com/Mandora-Manmeetsinh/herbal-codex.git
+
+# Step 2: Navigate to the project directory
+cd herbal-codex
+
+# Step 3: Install project dependencies
+npm install
+
+# Step 4: Start the development server
+npm start
+```
+
+### 🌐 Open in Browser
+After starting the server, open your browser and go to:
+```
+http://localhost:3000
+```
+
+You're now ready to explore the Herbal Codex!
 
 ---
 
 ## 📸 Preview
 
-> Here's a quick glimpse of **The Herbal Codex**:
+> A glimpse of the Herbal Codex in action:
 
 ![The Herbal Codex Preview](./preview.png.png)
 
 ---
 
-## 💡 Future Improvements
+## 💡 Planned Future Enhancements
 
-- 🌍 Multilingual translations (Hindi, Gujarati, etc.)
-- 🌟 AR Integration (Augmented Reality) for real-world plant projection.
-- 🧟 Educational Quizzes for herbal learning gamification.
-- 🖌️ More realistic plant models with GLTF/GLB imports.
+- 🌍 **Multilingual Translations**: Hindi, Gujarati, and other regional languages.
+- 📷 **AR Support**: Augmented Reality plant projection using WebXR or ARKit.
+- 🧠 **Quizzes & Leaderboards**: Challenge your herbal knowledge with gamified modules.
+- 🌳 **More Realistic Plants**: Import detailed GLTF/GLB models for better visual fidelity.
+- 🗂️ **User Profiles & Bookmarks**: Save and revisit favorite herbs or completed zones.
 
 ---
 
 ## 🤝 Contributors
 
-- **Project Lead**: [Mandora Manmeetsinh]
-- **UI/UX Designer**: [Mandora Manmeetsinh]
-- **3D Developer**: [Mandora Manmeetsinh]
+- 👨‍💻 **Project Lead / Developer**
+  [Mandora Manmeetsinh](https://github.com/Mandora-Manmeetsinh)
+- 👨‍💻 **UI/UX Developer / Database Manaer**  
+  [Astha Kharadi](https://github.com/asthakharadi)
 
 ---
 
 ## 📜 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the **MIT License** – see the [LICENSE](./LICENSE) file for details.
 
 ---
 
-> **"Let’s bring nature, healing, and technology together in one magical journey!"** 🌿✨
+> _“Let’s bring nature, healing, and technology together in one magical journey.”_ 🌿✨
 
 ---
 
-# 🚀 Ready to Explore Nature Virtually? 🌱  
-**The Herbal Codex** awaits you!
-
+## 🧭 Ready to Explore the Garden of Wisdom?  
+### **Start your journey with The Herbal Codex now!**
