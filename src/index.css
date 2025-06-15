@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -276,4 +275,72 @@
 
 .bg-radial-gradient {
   transition: background 0.3s ease;
+}
+
+/* --- Custom Animations for Super UI ---  */
+@keyframes garden-fade {
+  0% { opacity: 0; transform: translateY(30px);}
+  100% { opacity:1; transform: translateY(0);}
+}
+.animate-garden-fade {
+  animation: garden-fade 0.8s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes garden-slide {
+  0% { opacity: 0; transform: translateX(-40px) scale(0.98);}
+  100% { opacity:1; transform: translateX(0) scale(1);}
+}
+.animate-garden-slide {
+  animation: garden-slide 1s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes garden-float {
+  0% { opacity: 0; transform: perspective(600px) rotateX(8deg) scale(0.95) translateY(60px);}
+  80% { opacity: 1;}
+  100% { opacity:1; transform: perspective(600px) rotateX(0) scale(1) translateY(0);}
+}
+.animate-garden-float {
+  animation: garden-float 1.3s cubic-bezier(0.3,0.7,0.4,1) both;
+}
+
+@keyframes pop-scale {
+  0% { transform: scale(1);}
+  40% { transform: scale(1.25);}
+  55% { transform: scale(0.98);}
+  100% { transform: scale(1);}
+}
+.animate-pop-scale {
+  animation: pop-scale 0.7s cubic-bezier(0.5,2,0.2,1) both;
+}
+@keyframes burst {
+  0% { opacity: 0; transform: scale(0); }
+  60% { opacity: 1; transform: scale(1.1);}
+  100% { opacity: 0; transform: scale(2);}
+}
+.animate-burst {
+  animation: burst 0.7s cubic-bezier(0.65,0,0.7,1) both;
+}
+@keyframes glow {
+  0%,100% { text-shadow: 0 0 16px #fffba0, 0 0 25px #e0ffa7;}
+  50% { text-shadow: 0 0 40px #94ffb8, 0 0 50px #d4ac2b;}
+}
+.animate-glow {
+  animation: glow 2.8s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  to { background-position-x: -200%; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #fff6d4 10%, #dbffca 45%, #fff6d4 80%);
+  background-size: 200% 100%;
+  animation: shimmer 2.3s linear infinite;
+}
+
+@keyframes pulse-glow {
+  0%,100% { box-shadow: 0 0 60px 12px #52b78822; }
+  70% { box-shadow: 0 0 80px 28px #52ffb855;}
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
 }
