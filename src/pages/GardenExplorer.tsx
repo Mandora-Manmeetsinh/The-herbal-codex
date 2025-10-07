@@ -18,11 +18,19 @@ const GardenExplorer = () => {
   const zoneParam = queryParams.get('zone');
 
   interface Plant {
-    id: string;
     name: string;
-    // Add more specific fields as needed, for example:
-    description?: string;
+    scientificName: string;
+    description: string;
+    uses: string;
+    nativeRegions: string;
+    growingConditions: string;
     imageUrl?: string;
+    family?: string;
+    toxicity?: string;
+    floweringSeason?: string;
+    sunlight?: string;
+    waterNeeds?: string;
+    specialFeatures?: string[];
   }
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
   const [isRaining, setIsRaining] = useState(false);
@@ -38,15 +46,24 @@ const GardenExplorer = () => {
   const activeZone = zones.find(zone => zone.id === currentZone) || zones[0];
   const zonePlantsCount = activeZone ? activeZone.plants.length : 0;
   
-  // Accepts Scene type and maps to Plant type
-  // Scene type assumed: { id: number; name: string; description?: string; imageUrl?: string }
-  const handlePlantSelect = (plantData: { id: number; name: string; description?: string; imageUrl?: string }) => {
-    // Map Scene to Plant (convert id to string)
-    const mappedPlant = {
-      id: String(plantData.id),
+  // Accepts PlantType from GardenScene
+  const handlePlantSelect = (plantData: { 
+    id: string | number; 
+    name: string; 
+    scientificName: string;
+    description: string;
+    uses: string;
+    nativeRegions: string;
+    growingConditions: string;
+  }) => {
+    // Map to Plant interface for PlantInfoPanel
+    const mappedPlant: Plant = {
       name: plantData.name,
+      scientificName: plantData.scientificName,
       description: plantData.description,
-      imageUrl: plantData.imageUrl,
+      uses: plantData.uses,
+      nativeRegions: plantData.nativeRegions,
+      growingConditions: plantData.growingConditions,
     };
     setSelectedPlant(mappedPlant);
     setShowInstructions(false);
