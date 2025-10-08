@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
-import { Sky, Environment as DreiEnvironment, Stars, Cloud } from '@react-three/drei';
+import { Sky, Environment as DreiEnvironment, Stars, Cloud, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 import { getZoneById } from '@/data/zones';
 
@@ -476,7 +476,7 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
   
   return (
     <>
-      {/* Sky changes based on weather, time of day, and zone */}
+      {/* Enhanced Sky with better atmosphere */}
       <Sky
         distance={450000}
         sunPosition={skyParams.sunPosition}
@@ -488,7 +488,7 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
         mieDirectionalG={isNightMode ? 0.8 : 0.8}
       />
       
-      {/* Stars visible during night mode */}
+      {/* Enhanced stars with better visibility */}
       {isNightMode && <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />}
       
       {/* Moon visible at night */}
@@ -523,43 +523,92 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
         background={false}
       />
       
-      {/* Ambient light - adjusted for day/night */}
-      <ambientLight 
-        intensity={isNightMode ? 0.2 : (isRaining ? 0.5 : 0.8)} 
-        color={isNightMode ? "#102030" : ambientLightColor} 
-      />
+      {/* Enhanced ambient lighting with realistic values */}
+      <ambientLight intensity={isNightMode ? 0.15 : 0.6} color={ambientLightColor} />
       
-      {/* Directional light (sun/moon) */}
-      <directionalLight 
-        position={isNightMode ? [0, 10, -10] : [10, 20, 10]} 
-        intensity={isNightMode ? 0.1 : (isRaining ? 0.3 : 1.5)}
-        color={isNightMode ? "#77AABBFF" : "#FFFFFF"}
+      {/* Main directional light (sun/moon) with better shadow quality */}
+      <directionalLight
+        position={isNightMode ? [-5, 3, -5] : [10, 10, 5]}
+        intensity={isNightMode ? 0.5 : 2.5}
         castShadow
-        shadow-mapSize={[2048, 2048]} 
+        shadow-mapSize-width={4096}
+        shadow-mapSize-height={4096}
+        shadow-camera-far={50}
+        shadow-camera-left={-30}
+        shadow-camera-right={30}
+        shadow-camera-top={30}
+        shadow-camera-bottom={-30}
+        shadow-bias={-0.0001}
+        color={isNightMode ? "#b8c5d6" : "#fff8e7"}
       />
       
-      {/* Additional moon light at night */}
+      {/* Hemisphere light for natural sky-ground gradient */}
+      <hemisphereLight
+        color={isNightMode ? "#1a1a2e" : "#87ceeb"}
+        groundColor={groundColor}
+        intensity={isNightMode ? 0.3 : 0.8}
+      />
+      
+      {/* Fill light to reduce harsh shadows */}
+      <directionalLight
+        position={isNightMode ? [5, 3, 5] : [-10, 8, -5]}
+        intensity={isNightMode ? 0.2 : 0.6}
+        color={isNightMode ? "#4a5a7a" : "#b8d4ff"}
+      />
+      
+      {/* Dramatic point lights for night atmosphere */}
       {isNightMode && (
-        <spotLight 
-          position={[20, 30, -40]} 
-          intensity={0.5} 
-          color="#AACCFF" 
-          distance={100} 
-          angle={0.5} 
-          penumbra={1}
-        />
+        <>
+          <pointLight position={[8, 3, 0]} color="#ffcf75" intensity={1.5} distance={20} decay={2} castShadow />
+          <pointLight position={[-8, 3, 0]} color="#ffcf75" intensity={1.5} distance={20} decay={2} castShadow />
+          <pointLight position={[0, 3, 8]} color="#ffcf75" intensity={1.5} distance={20} decay={2} castShadow />
+          <pointLight position={[0, 3, -8]} color="#ffcf75" intensity={1.5} distance={20} decay={2} castShadow />
+          {/* Ambient blue moonlight glow */}
+          <pointLight position={[0, 15, 0]} color="#a8c5ff" intensity={0.8} distance={50} decay={2} />
+        </>
       )}
       
-      {/* Ground - adjusted color for day/night */}
+      {/* Warm accent lights for day */}
+      {!isNightMode && (
+        <>
+          <pointLight position={[10, 5, 10]} color="#ffe4b5" intensity={0.4} distance={15} />
+          <pointLight position={[-10, 5, -10]} color="#ffe4b5" intensity={0.4} distance={15} />
+        </>
+      )}
+      
+      {/* Contact shadows for better ground contact */}
+      <ContactShadows
+        opacity={isNightMode ? 0.3 : 0.5}
+        scale={50}
+        blur={2}
+        far={10}
+        resolution={512}
+        color={isNightMode ? "#000020" : "#000000"}
+      />
+      
+      {/* Enhanced ground plane with better material */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
-        <planeGeometry args={[100, 100]} />
+        <planeGeometry args={[100, 100, 100, 100]} />
         <meshStandardMaterial 
           color={
             isNightMode 
-              ? new THREE.Color(groundColor).multiplyScalar(0.3).getStyle()  // Much darker at night
+              ? new THREE.Color(groundColor).multiplyScalar(0.3).getHexString()
               : (isRaining ? (groundColor !== "#3a7e23" ? groundColor : "#2c5e1a") : groundColor)
           } 
-          roughness={0.8} 
+          roughness={0.95}
+          metalness={0}
+          envMapIntensity={0.2}
+        />
+      </mesh>
+      
+      {/* Add subtle grass layer effect */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.49, 0]} receiveShadow>
+        <planeGeometry args={[100, 100, 1, 1]} />
+        <meshStandardMaterial 
+          color={isNightMode ? "#1a3a1a" : "#4a7c4a"} 
+          transparent
+          opacity={0.3}
+          roughness={1}
         />
       </mesh>
       

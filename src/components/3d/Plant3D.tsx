@@ -101,41 +101,82 @@ const Plant3D = ({
       onPointerOut={() => setHovered(false)}
     >
       {hasModelError ? (
-        <group>
-          <mesh position={[0, 0.5, 0]}>
-            <cylinderGeometry args={[0.2, 0.2, 1, 8]} />
+        <group castShadow receiveShadow>
+          {/* Enhanced stem with better detail */}
+          <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
+            <cylinderGeometry args={[0.15, 0.2, 1, 16]} />
             <meshStandardMaterial 
               color="#3e8948" 
               emissive={isNightMode ? "#1a2e18" : "#000000"} 
               emissiveIntensity={emissiveIntensity}
+              roughness={0.8}
+              metalness={0.1}
             />
           </mesh>
           
-          <mesh position={[0, 1.2, 0]}>
-            <sphereGeometry args={[0.8, 16, 16]} />
+          {/* Main foliage sphere */}
+          <mesh position={[0, 1.2, 0]} castShadow receiveShadow>
+            <sphereGeometry args={[0.8, 32, 32]} />
             <meshStandardMaterial 
               color={plantColor} 
               emissive={isNightMode ? plantColor : "#000000"} 
               emissiveIntensity={emissiveIntensity}
+              roughness={0.9}
+              metalness={0}
+            />
+          </mesh>
+          
+          {/* Additional detail spheres for volume */}
+          <mesh position={[0.3, 1.3, 0.2]} castShadow receiveShadow>
+            <sphereGeometry args={[0.5, 24, 24]} />
+            <meshStandardMaterial 
+              color={plantColor} 
+              emissive={isNightMode ? plantColor : "#000000"} 
+              emissiveIntensity={emissiveIntensity}
+              roughness={0.9}
+              metalness={0}
+            />
+          </mesh>
+          
+          <mesh position={[-0.3, 1.1, -0.2]} castShadow receiveShadow>
+            <sphereGeometry args={[0.6, 24, 24]} />
+            <meshStandardMaterial 
+              color={plantColor} 
+              emissive={isNightMode ? plantColor : "#000000"} 
+              emissiveIntensity={emissiveIntensity}
+              roughness={0.9}
+              metalness={0}
             />
           </mesh>
         </group>
       ) : (
         <primitive 
-          object={gltfResult?.scene} 
+          object={gltfResult?.scene}
+          castShadow
+          receiveShadow
           onAfterRender={() => {
-            if (isNightMode && gltfResult?.scene) {
+            if (gltfResult?.scene) {
               gltfResult.scene.traverse((child: THREE.Object3D) => {
                 if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).material) {
                   const mesh = child as THREE.Mesh & { material: THREE.MeshStandardMaterial; userData: Record<string, unknown> };
+                  
+                  // Enable shadows
+                  mesh.castShadow = true;
+                  mesh.receiveShadow = true;
+                  
                   if (!mesh.userData.originalColor) {
                     mesh.userData.originalColor = mesh.material.color.clone();
                   }
                   
+                  // Enhanced material properties
+                  mesh.material.roughness = 0.9;
+                  mesh.material.metalness = 0;
+                  mesh.material.envMapIntensity = 0.3;
+                  
                   if (isNightMode) {
                     mesh.material.color.copy(mesh.userData.originalColor).multiplyScalar(0.5);
                     mesh.material.emissive = new THREE.Color(0x112211);
-                    mesh.material.emissiveIntensity = 0.2;
+                    mesh.material.emissiveIntensity = 0.3;
                   } else {
                     if (mesh.userData.originalColor) {
                       mesh.material.color.copy(mesh.userData.originalColor);
@@ -152,9 +193,24 @@ const Plant3D = ({
       
       {hovered && (
         <group>
-          <mesh position={[0, hasModelError ? 2 : 0.5, 0]} scale={[0.2, 0.2, 0.2]}>
-            <sphereGeometry args={[1, 16, 16]} />
-            <meshBasicMaterial color="#52B788" transparent opacity={0.5} />
+          {/* Enhanced hover effect with glow */}
+          <mesh position={[0, hasModelError ? 2 : 0.5, 0]} scale={[0.25, 0.25, 0.25]}>
+            <sphereGeometry args={[1, 32, 32]} />
+            <meshBasicMaterial 
+              color="#52B788" 
+              transparent 
+              opacity={0.4}
+            />
+          </mesh>
+          
+          {/* Outer glow ring */}
+          <mesh position={[0, hasModelError ? 2 : 0.5, 0]} scale={[0.35, 0.35, 0.35]}>
+            <sphereGeometry args={[1, 32, 32]} />
+            <meshBasicMaterial 
+              color="#52B788" 
+              transparent 
+              opacity={0.2}
+            />
           </mesh>
         </group>
       )}

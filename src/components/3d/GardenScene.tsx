@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Sky, Stars } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { EffectComposer, Bloom, SSAO, DepthOfField, Vignette } from '@react-three/postprocessing';
+import { BlendFunction } from 'postprocessing';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import Plant3D from './Plant3D';
 import Environment from './Environment';
@@ -324,10 +326,18 @@ const GardenScene = ({
   
   return (
     <div className="canvas-container">
-      <Canvas shadows>
+      <Canvas 
+        shadows
+        gl={{ 
+          antialias: true,
+          toneMapping: 2, // ACESFilmicToneMapping
+          toneMappingExposure: 1.2,
+          outputColorSpace: "srgb"
+        }}
+      >
         <Suspense fallback={<LoadingScreen />}>
           {!isFirstPerson ? (
-            <PerspectiveCamera makeDefault position={currentZone.position} fov={50} />
+            <PerspectiveCamera makeDefault position={currentZone.position} fov={55} />
           ) : (
             <FirstPersonCamera characterPosition={characterPosition} />
           )}
@@ -338,7 +348,7 @@ const GardenScene = ({
             isFirstPerson={isFirstPerson}
           />
           
-          <Environment 
+          <Environment
             isRaining={isRaining}
             isNightMode={isNightMode}
             zoneId={currentZoneId} 
@@ -346,23 +356,44 @@ const GardenScene = ({
             groundColor={currentZone.groundColor}
           />
           
-          {/* Garden paths specific to current zone */}
+          {/* Enhanced garden paths with better materials */}
           {gardenPaths.map((path, idx) => (
             <mesh 
               key={`path-${idx}`} 
               position={path.position as [number, number, number]} 
               rotation={path.rotation as [number, number, number]}
               receiveShadow
+              castShadow
             >
               <boxGeometry args={[path.scale[0], path.scale[1], path.scale[2]]} />
-              <meshStandardMaterial color="#e0d2bc" roughness={0.9} />
+              <meshStandardMaterial 
+                color={isNightMode ? "#b8a88a" : "#e0d2bc"} 
+                roughness={0.95}
+                metalness={0}
+                envMapIntensity={0.3}
+              />
             </mesh>
           ))}
           
-          {/* Zone entrance marker */}
-          <mesh position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-            <circleGeometry args={[1.5, 32]} />
-            <meshStandardMaterial color="#d4c9a8" roughness={0.8} />
+          {/* Enhanced zone entrance marker */}
+          <mesh position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow castShadow>
+            <circleGeometry args={[1.5, 64]} />
+            <meshStandardMaterial 
+              color={isNightMode ? "#9a8970" : "#d4c9a8"} 
+              roughness={0.7}
+              metalness={0.1}
+              envMapIntensity={0.4}
+            />
+          </mesh>
+          
+          {/* Decorative border around entrance */}
+          <mesh position={[0, 0.12, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+            <ringGeometry args={[1.45, 1.55, 64]} />
+            <meshStandardMaterial 
+              color={isNightMode ? "#7a6950" : "#a89978"} 
+              roughness={0.6}
+              metalness={0.2}
+            />
           </mesh>
           
           {/* Zone-specific plants */}
@@ -399,7 +430,7 @@ const GardenScene = ({
             />
           )}
           
-          {/* Zone name indicator on the ground */}
+          {/* Enhanced zone name indicator */}
           <mesh 
             position={[currentZone.position[0] * 0.3, 0.01, currentZone.position[2] * 0.3]} 
             rotation={[-Math.PI / 2, 0, 0]} 
@@ -407,11 +438,51 @@ const GardenScene = ({
           >
             <planeGeometry args={[4, 1]} />
             <meshStandardMaterial 
-              color="#8B4513" 
+              color={isNightMode ? "#6a3810" : "#8B4513"} 
               transparent 
-              opacity={0.7} 
+              opacity={0.6} 
+              roughness={0.9}
             />
           </mesh>
+          
+          {/* Post-processing effects for realism */}
+          <EffectComposer>
+            {/* Bloom for glowing effects */}
+            <Bloom
+              intensity={isNightMode ? 1.5 : 0.4}
+              luminanceThreshold={isNightMode ? 0.3 : 0.9}
+              luminanceSmoothing={0.9}
+              blendFunction={BlendFunction.ADD}
+            />
+            
+            {/* SSAO for ambient occlusion */}
+            <SSAO
+              blendFunction={BlendFunction.MULTIPLY}
+              samples={16}
+              radius={5}
+              intensity={30}
+              luminanceInfluence={0.6}
+              worldDistanceThreshold={0.5}
+              worldDistanceFalloff={0.1}
+              worldProximityThreshold={0.5}
+              worldProximityFalloff={0.1}
+            />
+            
+            {/* Depth of field for focus */}
+            <DepthOfField
+              focusDistance={0.02}
+              focalLength={0.05}
+              bokehScale={isFirstPerson ? 3 : 2}
+              height={480}
+            />
+            
+            {/* Vignette for cinematic look */}
+            <Vignette
+              offset={0.3}
+              darkness={isNightMode ? 0.7 : 0.4}
+              blendFunction={BlendFunction.NORMAL}
+            />
+          </EffectComposer>
         </Suspense>
       </Canvas>
     </div>
