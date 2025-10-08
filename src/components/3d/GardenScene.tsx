@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
@@ -305,7 +307,65 @@ const CameraController = ({
   );
 };
 
-const GardenScene = ({ 
+// Isolated wrapper using portal to prevent data-lov-* attributes from reaching R3F
+const IsolatedGardenScene = (props: GardenSceneProps) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
+  
+  useEffect(() => {
+    // Create a new div for the portal
+    const div = document.createElement('div');
+    div.style.width = '100%';
+    div.style.height = '100%';
+    div.style.position = 'absolute';
+    div.style.top = '0';
+    div.style.left = '0';
+    setPortalContainer(div);
+    
+    if (containerRef.current) {
+      containerRef.current.appendChild(div);
+    }
+    
+    return () => {
+      if (containerRef.current && div) {
+        containerRef.current.removeChild(div);
+      }
+    };
+  }, []);
+  
+  // Explicitly extract only the props we need
+  const {
+    onPlantSelect,
+    isRaining,
+    isNightMode,
+    currentZoneId,
+    isZoneChanging,
+    isFirstPerson,
+    characterPosition,
+    onCharacterMove
+  } = props;
+  
+  return (
+    <div ref={containerRef} className="canvas-container" style={{ position: 'relative', width: '100%', height: '100%' }}>
+      {portalContainer && ReactDOM.createPortal(
+        <GardenSceneInternal 
+          onPlantSelect={onPlantSelect}
+          isRaining={isRaining}
+          isNightMode={isNightMode}
+          currentZoneId={currentZoneId}
+          isZoneChanging={isZoneChanging}
+          isFirstPerson={isFirstPerson}
+          characterPosition={characterPosition}
+          onCharacterMove={onCharacterMove}
+        />,
+        portalContainer
+      )}
+    </div>
+  );
+};
+
+// Memoize to prevent re-renders with injected attributes
+const GardenSceneInternal = React.memo(({
   onPlantSelect, 
   isRaining, 
   isNightMode,
@@ -333,14 +393,14 @@ const GardenScene = ({
   );
   
   return (
-    <div className="canvas-container">
-      <SafeCanvas 
-        shadows
-        gl={{ 
-          antialias: true,
-          powerPreference: "high-performance"
-        }}
-      >
+    <SafeCanvas 
+      shadows
+      gl={{ 
+        antialias: true,
+        powerPreference: "high-performance"
+      }}
+      style={{ width: '100%', height: '100%', display: 'block' }}
+    >
         <Suspense fallback={<LoadingScreen />}>
           {!isFirstPerson ? (
             <PerspectiveCamera makeDefault position={currentZone.position} fov={55} />
@@ -451,22 +511,20 @@ const GardenScene = ({
             />
           </mesh>
           
-          {/* Simplified post-processing effects */}
-          <EffectComposer>
-            {/* Bloom for glowing effects */}
+          {/* Temporarily disabled post-processing to isolate error */}
+          {/* <EffectComposer>
             <Bloom
               intensity={isNightMode ? 1.2 : 0.3}
               luminanceThreshold={isNightMode ? 0.4 : 0.9}
               luminanceSmoothing={0.9}
             />
-          </EffectComposer>
+          </EffectComposer> */}
         </Suspense>
       </SafeCanvas>
-    </div>
   );
-};
+});
 
-export default GardenScene;
+export default IsolatedGardenScene;
 
 interface PlantProps {
   position: [number, number, number];
