@@ -1,14 +1,22 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
-import { EffectComposer, Bloom, SSAO, DepthOfField, Vignette } from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import Plant3D from './Plant3D';
 import Environment from './Environment';
 import LoadingScreen from '../ui/LoadingScreen';
 import { getZoneById, zones } from '@/data/zones';
 import GardenCharacter from './GardenCharacter';
+
+// Filter out any injected data-* attributes that break react-three-fiber
+const SafeCanvas = ({ children, ...rest }: React.ComponentProps<typeof Canvas>) => {
+  const filtered = Object.fromEntries(
+    Object.entries(rest as Record<string, unknown>).filter(([k]) => !k.startsWith('data-'))
+  );
+  return <Canvas {...(filtered as any)}>{children}</Canvas>;
+};
+
 
 interface PlantType {
   id: string | number;
@@ -326,7 +334,7 @@ const GardenScene = ({
   
   return (
     <div className="canvas-container">
-      <Canvas 
+      <SafeCanvas 
         shadows
         gl={{ 
           antialias: true,
@@ -453,7 +461,7 @@ const GardenScene = ({
             />
           </EffectComposer>
         </Suspense>
-      </Canvas>
+      </SafeCanvas>
     </div>
   );
 };
