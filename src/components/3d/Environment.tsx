@@ -526,13 +526,13 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
       {/* Enhanced ambient lighting with realistic values */}
       <ambientLight intensity={isNightMode ? 0.15 : 0.6} color={ambientLightColor} />
       
-      {/* Main directional light (sun/moon) with better shadow quality */}
+      {/* Main directional light (sun/moon) with optimized shadow quality */}
       <directionalLight
         position={isNightMode ? [-5, 3, -5] : [10, 10, 5]}
         intensity={isNightMode ? 0.5 : 2.5}
         castShadow
-        shadow-mapSize-width={4096}
-        shadow-mapSize-height={4096}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
         shadow-camera-far={50}
         shadow-camera-left={-30}
         shadow-camera-right={30}
@@ -556,15 +556,12 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
         color={isNightMode ? "#4a5a7a" : "#b8d4ff"}
       />
       
-      {/* Dramatic point lights for night atmosphere */}
+      {/* Optimized point lights for night atmosphere */}
       {isNightMode && (
         <>
-          <pointLight position={[8, 3, 0]} color="#ffcf75" intensity={1.5} distance={20} decay={2} castShadow />
-          <pointLight position={[-8, 3, 0]} color="#ffcf75" intensity={1.5} distance={20} decay={2} castShadow />
-          <pointLight position={[0, 3, 8]} color="#ffcf75" intensity={1.5} distance={20} decay={2} castShadow />
-          <pointLight position={[0, 3, -8]} color="#ffcf75" intensity={1.5} distance={20} decay={2} castShadow />
-          {/* Ambient blue moonlight glow */}
-          <pointLight position={[0, 15, 0]} color="#a8c5ff" intensity={0.8} distance={50} decay={2} />
+          <pointLight position={[8, 3, 0]} color="#ffcf75" intensity={1.2} distance={20} decay={2} />
+          <pointLight position={[-8, 3, 0]} color="#ffcf75" intensity={1.2} distance={20} decay={2} />
+          <pointLight position={[0, 15, 0]} color="#a8c5ff" intensity={0.6} distance={50} decay={2} />
         </>
       )}
       
@@ -575,16 +572,6 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
           <pointLight position={[-10, 5, -10]} color="#ffe4b5" intensity={0.4} distance={15} />
         </>
       )}
-      
-      {/* Contact shadows for better ground contact */}
-      <ContactShadows
-        opacity={isNightMode ? 0.3 : 0.5}
-        scale={50}
-        blur={2}
-        far={10}
-        resolution={512}
-        color={isNightMode ? "#000020" : "#000000"}
-      />
       
       {/* Enhanced ground plane with better material */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>

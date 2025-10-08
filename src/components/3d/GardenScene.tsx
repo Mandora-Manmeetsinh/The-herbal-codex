@@ -330,9 +330,7 @@ const GardenScene = ({
         shadows
         gl={{ 
           antialias: true,
-          toneMapping: 2, // ACESFilmicToneMapping
-          toneMappingExposure: 1.2,
-          outputColorSpace: "srgb"
+          powerPreference: "high-performance"
         }}
       >
         <Suspense fallback={<LoadingScreen />}>
@@ -445,42 +443,13 @@ const GardenScene = ({
             />
           </mesh>
           
-          {/* Post-processing effects for realism */}
+          {/* Simplified post-processing effects */}
           <EffectComposer>
             {/* Bloom for glowing effects */}
             <Bloom
-              intensity={isNightMode ? 1.5 : 0.4}
-              luminanceThreshold={isNightMode ? 0.3 : 0.9}
+              intensity={isNightMode ? 1.2 : 0.3}
+              luminanceThreshold={isNightMode ? 0.4 : 0.9}
               luminanceSmoothing={0.9}
-              blendFunction={BlendFunction.ADD}
-            />
-            
-            {/* SSAO for ambient occlusion */}
-            <SSAO
-              blendFunction={BlendFunction.MULTIPLY}
-              samples={16}
-              radius={5}
-              intensity={30}
-              luminanceInfluence={0.6}
-              worldDistanceThreshold={0.5}
-              worldDistanceFalloff={0.1}
-              worldProximityThreshold={0.5}
-              worldProximityFalloff={0.1}
-            />
-            
-            {/* Depth of field for focus */}
-            <DepthOfField
-              focusDistance={0.02}
-              focalLength={0.05}
-              bokehScale={isFirstPerson ? 3 : 2}
-              height={480}
-            />
-            
-            {/* Vignette for cinematic look */}
-            <Vignette
-              offset={0.3}
-              darkness={isNightMode ? 0.7 : 0.4}
-              blendFunction={BlendFunction.NORMAL}
             />
           </EffectComposer>
         </Suspense>
