@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
-import { Sky, Environment as DreiEnvironment, Stars, Cloud, ContactShadows } from '@react-three/drei';
+import { Sky, Environment as DreiEnvironment, Stars, Cloud, ContactShadows, Float, MeshReflectorMaterial, GradientTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { getZoneById } from '@/data/zones';
 
@@ -11,6 +11,177 @@ interface EnvironmentProps {
   ambientLightColor: string;
   groundColor: string;
 }
+
+// Grass Patches Component
+const GrassPatches = ({ isNightMode }: { isNightMode: boolean }) => {
+  const patches = useMemo(() => {
+    return [...Array(40)].map(() => ({
+      x: (Math.random() - 0.5) * 40,
+      z: (Math.random() - 0.5) * 40,
+      scale: 0.3 + Math.random() * 0.4,
+      rotation: Math.random() * Math.PI
+    }));
+  }, []);
+  
+  return (
+    <>
+      {patches.map((patch, i) => (
+        <mesh
+          key={`grass-${i}`}
+          position={[patch.x, -0.48, patch.z]}
+          rotation={[-Math.PI / 2, 0, patch.rotation]}
+          receiveShadow
+        >
+          <planeGeometry args={[patch.scale, patch.scale, 4, 4]} />
+          <meshStandardMaterial 
+            color={isNightMode ? "#2a4a2a" : "#4a7c4a"}
+            roughness={0.95}
+            transparent
+            opacity={0.7}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      ))}
+    </>
+  );
+};
+
+// Decorative Rocks Component
+const DecorativeRocks = () => {
+  const rocks = useMemo(() => {
+    return [...Array(8)].map(() => ({
+      position: [(Math.random() - 0.5) * 35, -0.3, (Math.random() - 0.5) * 35] as [number, number, number],
+      scale: 0.6 + Math.random() * 0.6,
+      rotation: [Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI] as [number, number, number]
+    }));
+  }, []);
+  
+  return (
+    <>
+      {rocks.map((rock, i) => (
+        <mesh 
+          key={`rock-${i}`} 
+          position={rock.position} 
+          rotation={rock.rotation} 
+          scale={rock.scale} 
+          castShadow 
+          receiveShadow
+        >
+          <dodecahedronGeometry args={[0.5, 1]} />
+          <meshStandardMaterial 
+            color="#6a6a5a"
+            roughness={0.9}
+            metalness={0.1}
+            envMapIntensity={0.3}
+          />
+        </mesh>
+      ))}
+    </>
+  );
+};
+
+// Background Trees Component
+const BackgroundTrees = ({ isNightMode }: { isNightMode: boolean }) => {
+  const trees = useMemo(() => {
+    return [
+      [-15, 0, -10], [15, 0, -10],
+      [-15, 0, 10], [15, 0, 10],
+      [-20, 0, 0], [20, 0, 0]
+    ] as [number, number, number][];
+  }, []);
+  
+  return (
+    <>
+      {trees.map((pos, i) => (
+        <group key={`tree-${i}`} position={pos}>
+          {/* Trunk */}
+          <mesh position={[0, 2, 0]} castShadow>
+            <cylinderGeometry args={[0.3, 0.4, 4, 12]} />
+            <meshStandardMaterial 
+              color="#3d2817"
+              roughness={0.9}
+            />
+          </mesh>
+          
+          {/* Foliage layers */}
+          {[0, 1, 2].map((layer) => (
+            <mesh 
+              key={layer}
+              position={[0, 4 + layer * 0.8, 0]} 
+              castShadow
+            >
+              <coneGeometry args={[1.5 - layer * 0.3, 2, 12]} />
+              <meshStandardMaterial 
+                color={
+                  isNightMode 
+                    ? (layer === 0 ? '#0a2d1e' : layer === 1 ? '#1d3a2a' : '#2a4a3a')
+                    : (layer === 0 ? '#1a4d2e' : layer === 1 ? '#2d5a3a' : '#3a6a4a')
+                }
+                roughness={0.8}
+              />
+            </mesh>
+          ))}
+        </group>
+      ))}
+    </>
+  );
+};
+
+// Butterflies Component
+const Butterflies = () => {
+  const butterflyRefs = useRef<THREE.Group[]>([]);
+  const positions = useMemo(() => [[-5, 2, -5], [5, 2, 5], [0, 2, -8]] as [number, number, number][], []);
+  
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    butterflyRefs.current.forEach((ref, i) => {
+      if (ref) {
+        ref.position.x = positions[i][0] + Math.sin(t * 0.5 + i) * 3;
+        ref.position.y = positions[i][1] + Math.sin(t * 0.8 + i) * 1 + 1;
+        ref.position.z = positions[i][2] + Math.cos(t * 0.5 + i) * 3;
+        ref.rotation.y = Math.sin(t * 0.5 + i) * 0.5;
+      }
+    });
+  });
+  
+  return (
+    <>
+      {positions.map((pos, i) => (
+        <group 
+          key={`butterfly-${i}`} 
+          ref={(el) => {
+            if (el) butterflyRefs.current[i] = el;
+          }}
+          position={pos}
+        >
+          {/* Left wing */}
+          <mesh position={[-0.05, 0, 0]} rotation={[0, 0, Math.PI / 4]}>
+            <sphereGeometry args={[0.08, 8, 8]} />
+            <meshStandardMaterial 
+              color="#ff6b9d"
+              emissive="#ff6b9d"
+              emissiveIntensity={0.3}
+              transparent
+              opacity={0.8}
+            />
+          </mesh>
+          
+          {/* Right wing */}
+          <mesh position={[0.05, 0, 0]} rotation={[0, 0, -Math.PI / 4]}>
+            <sphereGeometry args={[0.08, 8, 8]} />
+            <meshStandardMaterial 
+              color="#ff6b9d"
+              emissive="#ff6b9d"
+              emissiveIntensity={0.3}
+              transparent
+              opacity={0.8}
+            />
+          </mesh>
+        </group>
+      ))}
+    </>
+  );
+};
 
 const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, groundColor }: EnvironmentProps) => {
   const { scene } = useThree();
@@ -573,31 +744,74 @@ const Environment = ({ isRaining, isNightMode, zoneId, ambientLightColor, ground
         </>
       )}
       
-      {/* Enhanced ground plane with better material */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
-        <planeGeometry args={[100, 100, 100, 100]} />
-        <meshStandardMaterial 
-          color={
-            isNightMode 
-              ? new THREE.Color(groundColor).multiplyScalar(0.3).getHexString()
-              : (isRaining ? (groundColor !== "#3a7e23" ? groundColor : "#2c5e1a") : groundColor)
-          } 
-          roughness={0.95}
-          metalness={0}
-          envMapIntensity={0.2}
+      {/* Enhanced ground plane with realistic materials */}
+      <group>
+        {/* Main ground plane */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
+          <planeGeometry args={[100, 100, 100, 100]} />
+          <meshStandardMaterial 
+            color={
+              isNightMode 
+                ? new THREE.Color(groundColor).multiplyScalar(0.3).getHexString()
+                : (isRaining ? (groundColor !== "#3a7e23" ? groundColor : "#2c5e1a") : groundColor)
+            } 
+            roughness={0.9}
+            metalness={0.1}
+            envMapIntensity={0.3}
+          >
+            <GradientTexture
+              stops={[0, 0.5, 1]}
+              colors={
+                isNightMode 
+                  ? ['#1a3a1a', '#2d4a2b', '#1a3a1a']
+                  : ['#2d4a2b', '#3a5a3a', '#2d4a2b']
+              }
+            />
+          </meshStandardMaterial>
+        </mesh>
+        
+        {/* Reflective layer for wet ground effect */}
+        {!isNightMode && (
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.49, 0]}>
+            <planeGeometry args={[100, 100]} />
+            <MeshReflectorMaterial
+              blur={[400, 100]}
+              resolution={512}
+              mixBlur={1}
+              mixStrength={isRaining ? 0.3 : 0.1}
+              roughness={1}
+              depthScale={1}
+              minDepthThreshold={0.4}
+              maxDepthThreshold={1.4}
+              color={groundColor}
+              metalness={0.1}
+              mirror={0}
+            />
+          </mesh>
+        )}
+        
+        {/* Enhanced contact shadows */}
+        <ContactShadows
+          opacity={isNightMode ? 0.3 : 0.5}
+          scale={50}
+          blur={2}
+          far={10}
+          resolution={256}
+          color="#000000"
         />
-      </mesh>
+      </group>
       
-      {/* Add subtle grass layer effect */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.49, 0]} receiveShadow>
-        <planeGeometry args={[100, 100, 1, 1]} />
-        <meshStandardMaterial 
-          color={isNightMode ? "#1a3a1a" : "#4a7c4a"} 
-          transparent
-          opacity={0.3}
-          roughness={1}
-        />
-      </mesh>
+      {/* Grass patches scattered around */}
+      <GrassPatches isNightMode={isNightMode} />
+      
+      {/* Decorative rocks */}
+      <DecorativeRocks />
+      
+      {/* Background trees */}
+      <BackgroundTrees isNightMode={isNightMode} />
+      
+      {/* Flying butterflies during day */}
+      {!isNightMode && !isRaining && <Butterflies />}
       
       {/* Zone-specific features */}
       {createZoneElements()}

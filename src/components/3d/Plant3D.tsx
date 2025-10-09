@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { useGLTF, useAnimations } from '@react-three/drei';
+import { useGLTF, useAnimations, Sparkles, Float } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
@@ -193,11 +193,21 @@ const Plant3D = ({
       
       {hovered && (
         <group>
+          {/* Magical sparkles when hovering */}
+          <Sparkles
+            count={30}
+            scale={2}
+            size={2}
+            speed={0.4}
+            opacity={0.6}
+            color={color}
+          />
+          
           {/* Enhanced hover effect with glow */}
           <mesh position={[0, hasModelError ? 2 : 0.5, 0]} scale={[0.25, 0.25, 0.25]}>
             <sphereGeometry args={[1, 32, 32]} />
             <meshBasicMaterial 
-              color="#52B788" 
+              color={color} 
               transparent 
               opacity={0.4}
             />
@@ -207,30 +217,46 @@ const Plant3D = ({
           <mesh position={[0, hasModelError ? 2 : 0.5, 0]} scale={[0.35, 0.35, 0.35]}>
             <sphereGeometry args={[1, 32, 32]} />
             <meshBasicMaterial 
-              color="#52B788" 
+              color={color} 
               transparent 
               opacity={0.2}
             />
           </mesh>
+          
+          {/* Glowing point light */}
+          <pointLight
+            position={[0, hasModelError ? 2 : 0.5, 0]}
+            color={color}
+            intensity={1.5}
+            distance={3}
+            decay={2}
+          />
         </group>
       )}
 
       {isNightMode && (
-        <group>
-          {[...Array(3)].map((_, i) => (
-            <mesh 
-              key={`firefly-${i}`} 
-              position={[
-                Math.random() * 1.5 - 0.75, 
-                Math.random() * 1.5 + 0.5, 
-                Math.random() * 1.5 - 0.75
-              ]}
-            >
-              <sphereGeometry args={[0.03, 8, 8]} />
-              <meshBasicMaterial color="#FFD700" transparent opacity={0.7} />
-            </mesh>
-          ))}
-        </group>
+        <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.5}>
+          <group>
+            {[...Array(5)].map((_, i) => (
+              <mesh 
+                key={`firefly-${i}`} 
+                position={[
+                  Math.random() * 1.5 - 0.75, 
+                  Math.random() * 1.5 + 0.5, 
+                  Math.random() * 1.5 - 0.75
+                ]}
+              >
+                <sphereGeometry args={[0.04, 8, 8]} />
+                <meshStandardMaterial 
+                  color="#FFD700" 
+                  emissive="#FFD700"
+                  emissiveIntensity={2}
+                  toneMapped={false}
+                />
+              </mesh>
+            ))}
+          </group>
+        </Float>
       )}
     </group>
   );

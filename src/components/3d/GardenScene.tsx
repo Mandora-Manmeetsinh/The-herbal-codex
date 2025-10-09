@@ -3,8 +3,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, DepthOfField, Vignette } from '@react-three/postprocessing';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import * as THREE from 'three';
 import Plant3D from './Plant3D';
 import Environment from './Environment';
 import LoadingScreen from '../ui/LoadingScreen';
@@ -397,7 +398,9 @@ const GardenSceneInternal = React.memo(({
       shadows
       gl={{ 
         antialias: true,
-        powerPreference: "high-performance"
+        powerPreference: "high-performance",
+        toneMapping: THREE.ACESFilmicToneMapping,
+        toneMappingExposure: isNightMode ? 0.4 : 1.0
       }}
       style={{ width: '100%', height: '100%', display: 'block' }}
     >
@@ -511,14 +514,23 @@ const GardenSceneInternal = React.memo(({
             />
           </mesh>
           
-          {/* Temporarily disabled post-processing to isolate error */}
-          {/* <EffectComposer>
+          {/* Enhanced post-processing effects */}
+          <EffectComposer>
             <Bloom
-              intensity={isNightMode ? 1.2 : 0.3}
-              luminanceThreshold={isNightMode ? 0.4 : 0.9}
+              intensity={isNightMode ? 1.5 : 0.5}
+              luminanceThreshold={isNightMode ? 0.2 : 0.9}
               luminanceSmoothing={0.9}
             />
-          </EffectComposer> */}
+            <DepthOfField
+              focusDistance={0.01}
+              focalLength={0.1}
+              bokehScale={isNightMode ? 3 : 1.5}
+            />
+            <Vignette
+              offset={0.3}
+              darkness={isNightMode ? 0.7 : 0.4}
+            />
+          </EffectComposer>
         </Suspense>
       </SafeCanvas>
   );
