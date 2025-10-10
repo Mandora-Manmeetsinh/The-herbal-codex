@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
-import { EffectComposer, Bloom, DepthOfField, Vignette } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, DepthOfField } from '@react-three/postprocessing';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import Plant3D from './Plant3D';
@@ -525,10 +525,6 @@ const GardenSceneInternal = React.memo(({
               focusDistance={0.01}
               focalLength={0.1}
               bokehScale={isNightMode ? 3 : 1.5}
-            />
-            <Vignette
-              offset={0.3}
-              darkness={isNightMode ? 0.7 : 0.4}
             />
           </EffectComposer>
         </Suspense>
